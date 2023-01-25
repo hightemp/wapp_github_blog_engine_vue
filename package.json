@@ -7,9 +7,14 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@octokit/core": "^4.2.0",
+    "@octokit/rest": "^19.0.7",
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.3",
     "core-js": "^3.8.3",
+    "js-base64": "^3.7.4",
+    "octokit": "^2.0.14",
+    "tiny-emitter": "^2.1.0",
     "vue": "^3.2.13"
   },
   "devDependencies": {

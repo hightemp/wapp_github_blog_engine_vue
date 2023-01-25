@@ -2,11 +2,8 @@
 <div id="mode-list" class="mode">
     <div class="all-articles-panel">
         <div class="actions-panel">
-            <a id="all-articles-reload" class="btn btn-primary" aria-current="page"><i class="bi bi-arrow-repeat"></i></a>
-            <button class="btn btn-success" name="all-articles-create" value=""><i class="bi bi-plus-lg"></i></button>
-            <button class="btn btn-secondary" name="all-articles-edit" value=""><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-danger" name="all-articles-remove" value=""><i class="bi bi-trash"></i></button>
-            <button class="btn btn-secondary" name="all-articles-toggle-favorite" value=""><i class="bi bi-star-fill"></i></button>
+            <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="" @input="fnFilter">
+            <Dropdown :items="aDropdownMenu" />
         </div>
         <div class="list"></div>
     </div>
@@ -14,8 +11,35 @@
 </template>
 
 <script>
-export default {
 
+import { Database } from "../../Database"
+
+import Dropdown from "../dropdown.vue"
+
+export default {
+    name: 'ListMode',
+
+    components: {
+        Dropdown
+    },
+
+    data() {
+        return {
+            aDropdownMenu: [
+                { id:"reload", title:'<i class="bi bi-arrow-repeat"></i> Обновить' },
+                { id:"add", title:'<i class="bi bi-plus-lg"></i> Добавить' },
+                { id:"edit", title:'<i class="bi bi-pencil"></i> Редактировать' },
+                { id:"delete", title:'<i class="bi bi-trash"></i> Удалить' },
+                { id:"favorites", title:'<i class="bi bi-star-fill"></i> В избранное' },
+            ]
+        }
+    },
+
+    methods: {
+        fnFilter() {
+
+        }
+    }
 }
 </script>
 

@@ -1,5 +1,15 @@
 <template>
     <div class="wrapper">
+        <div class="top-panel">
+          <div>
+            <template v-if="oRepo"> 
+            {{oRepo.login}} | {{oRepo.repo}} | <a :href="sURL">{{sURL}}</a>
+            </template>
+          </div>
+          <div class="top-right-panel">
+            <button class="" @click="fnShowRepoWindow" title="Выбрать другую сессию"><i class="bi bi-person-fill"></i></button>
+          </div>
+        </div>
         <div class="app-modes">
           <a v-for="oMenuItem in aMenu" :key="oMenuItem.class" :class="(sCurrentMode==oMenuItem.class ? 'btn-primary' : '') + ' btn '+oMenuItem.class" :title="oMenuItem.title" @click="fnMenuItemClick(oMenuItem)"><i :class="'bi '+oMenuItem.icon"></i></a>
         </div>
@@ -20,10 +30,16 @@
             <LinksMode/>
           </template>
         </div>
-        
     </div>
 
-    <!-- <div id="block-overlay"></div> -->
+    <div class="page-panel"></div>
+    <template v-if="bShowErrorWindow">
+      <ErrorWindow/>
+    </template>
+
+    <template v-if="bShowRepoWindow">
+      <AskAPIWindow/>
+    </template>
 </template>
 
 <script>
@@ -33,6 +49,13 @@ import FavoritesMode from "./components/modes/favorites.vue"
 import TagsMode from "./components/modes/tags.vue"
 import LinksMode from "./components/modes/links.vue"
 
+import ErrorWindow from "./components/windows/error.vue"
+import AskAPIWindow from "./components/windows/ask_api.vue"
+
+import { Database } from "./Database"
+
+import { emitter } from "./EventBus"
+
 export default {
   name: 'App',
   components: {
@@ -41,10 +64,20 @@ export default {
     FavoritesMode,
     TagsMode,
     LinksMode,
+    ErrorWindow,
+    AskAPIWindow,
   },
 
   data() {
     return {
+      sURL: "",
+      oRepo: null,
+
+      bShowErrorWindow: false,
+      sErrorWindowMesssage: "",
+
+      bShowRepoWindow: true,
+
       sCurrentMode: "",
       aMenu: [
         { class:"app-mode-list", title:"Список", icon:"bi-justify" },
@@ -55,7 +88,7 @@ export default {
         { class:"app-publish-btn", title:"Публикация", icon:"bi-journal-arrow-up" },
         { class:"app-export-btn", title:"Экспорт", icon:"bi-download" },
         { class:"app-import-btn", title:"Импорт", icon:"bi-upload" },
-      ]
+      ],
     }
   },
 
@@ -73,7 +106,44 @@ export default {
       } else {
         this.sCurrentMode = oMenuItem.class
       }
+    },
+    fnShowRepoWindow() {
+      this.bShowRepoWindow = true
     }
+  },
+
+  created() {
+    Database.fnInit()
+    var oThis = this;
+
+    emitter.emit('app-created')
+
+    emitter.on('database-load-error-github-exception', () => {
+      oThis.bShowErrorWindow = true
+    })
+
+    emitter.on('database-load-error-notfound', () => {
+      oThis.bShowErrorWindow = true
+    })
+
+    emitter.on('error-window-close', () => {
+      oThis.bShowErrorWindow = false
+    })
+
+    emitter.on('repo-window-close', () => {
+      oThis.bShowRepoWindow = false
+    })
+
+    emitter.on('database-repos-loaded', ({aList, iSelectedRepoIndex}) => {
+      _l('!!!', {aList, iSelectedRepoIndex})
+      if (aList[iSelectedRepoIndex]) {
+        var oO = oThis.oRepo = aList[iSelectedRepoIndex]
+
+        oThis.sURL = `http://github.com/${oO.login}/${oO.repo}`
+      } else {
+        oThis.oRepo = null
+      }
+    })
   }
 }
 </script>

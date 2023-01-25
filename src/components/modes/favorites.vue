@@ -2,10 +2,8 @@
 <div id="mode-favorites" class="mode">
     <div class="favorites-panel">
         <div class="actions-panel">
-            <a id="favorites-reload" class="btn btn-primary" aria-current="page"><i class="bi bi-arrow-repeat"></i></a>
-            <button class="btn btn-success" id="favorites-groups-create" value=""><i class="bi bi-plus-lg"></i></button>
-            <button class="btn btn-secondary" id="favorites-groups-edit" value=""><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-danger" id="favorites-groups-remove" value=""><i class="bi bi-trash"></i></button>
+            <input type="text" class="form-control" @input="fnFilter">
+            <Dropdown :items="aDropdownMenu" />
         </div>
         <div class="list"></div>
     </div>
@@ -13,8 +11,33 @@
 </template>
 
 <script>
-export default {
 
+import Dropdown from "../dropdown.vue"
+
+export default {
+    name: 'FavoritesMode',
+
+    components: {
+        Dropdown
+    },
+
+    data() {
+        return {
+            aDropdownMenu: [
+                { id:"reload", title:'<i class="bi bi-arrow-repeat"></i> Обновить' },
+                { id:"add", title:'<i class="bi bi-plus-lg"></i> Добавить' },
+                { id:"edit", title:'<i class="bi bi-pencil"></i> Редактировать' },
+                { id:"delete", title:'<i class="bi bi-trash"></i> Удалить' },
+                { id:"favorites", title:'<i class="bi bi-star-fill"></i> Убрать из ибранного' },
+            ],
+        }
+    },
+
+    methods: {
+        fnFilter() {
+
+        },
+    }
 }
 </script>
 

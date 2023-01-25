@@ -14,7 +14,7 @@ body, html {
     border-radius: 0px !important;
 }
 
-#block-overlay {
+.block-overlay {
     position:absolute;
     top: 0px;
     left: 0px;
@@ -30,8 +30,30 @@ body, html {
     right: 0px;
     bottom: 0px;
     display: grid;
-    grid-template-columns: 30px 1fr 1fr;
     background: #eee;
+    grid-template-columns: 30px 1fr 1fr; 
+    grid-template-rows: 20px 1fr 1fr; 
+    gap: 0px 0px; 
+    grid-template-areas: 
+        "a a a"
+        "b c d"
+        "b c d"; 
+}
+
+.top-panel {
+    grid-area: a;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    display: grid;
+    grid-template-columns: 1fr 20px;
+}
+
+.top-right-panel > * {
+    height: 18px;
+    border: none;
+    padding: 0px;
+    width: 20px;
+    height: 20px;
+    background: rgba(0,0,0,0.2);
 }
 
 .wrapper > * {
@@ -40,6 +62,7 @@ body, html {
 
 .app-modes > * {
     width: 100%;
+    grid-area: b;
 }
 
 .hidden {
@@ -109,10 +132,12 @@ body, html {
 .current-mode {
     border-left: 1px solid #eee;
     display: flex;
+    grid-area: c;
 }
 
 .page-panel {
     border-left: 1px solid #eee;
+    grid-area: d;
 }
 
 .mode {
@@ -215,4 +240,49 @@ a {
 .tags-lists-buttons {
     display: flex;
     flex-wrap: wrap;
+}
+
+.modal.show {
+    display: block;
+}
+
+.w {
+    height: 100px;
+    width: 100px;
+}
+
+.list-repo-item {
+    display: grid;
+    grid-template-columns: 1fr 100px;
+    padding: 5px;
+}
+
+.modal-ask-api_list_buttons {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px;
+    gap: 5px;
+    padding: 0px 0px 5px 0px;
+    border-bottom: 1px solid #eee;
+}
+
+#modal-ask-api-key .form-label {
+    width: 100%;
+    text-align: left;
+}
+
+.list-repo-item:nth-child(2n) {
+    background: rgba(0,0,0,0.1);
+}
+
+.list-repo-item:hover {
+    background: rgba(0,0,0,0.2);
+}
+
+.list-repo-item_desc * {
+    text-align: left;
+    word-break: break-all;
+}
+
+.list-repo-item.active {
+    border: 1px solid grey;
 }
