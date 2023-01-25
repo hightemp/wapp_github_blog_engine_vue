@@ -1,5 +1,7 @@
 # wapp_github_blog_engine_vue
 
+Движок для введения блога с использованием github api и github pages.
+
 ## Project setup
 ```
 npm install
