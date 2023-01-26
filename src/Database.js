@@ -11,6 +11,10 @@ export class Database {
     ]
 
     static iSelectedRepo = null
+    static iSelectedArticle = null
+    static iSelectedCategory = null
+    static iSelectedGroup = null
+    static iSelectedTag = null
 
     static oDatabase = {
         "groups_last_id": "0",
@@ -135,8 +139,12 @@ export class Database {
     {
         if (Database.aReposList[iRepoIndex]) {
             Database.iSelectedRepo = iRepoIndex
+            _l('fnSelectRepo')
             emitter.emit('database-repos-selected')
             emitter.emit('database-repos-save')
+
+            // NOTE: Переписать сделать после подгрузки репозитория
+            // Выбор -> Проверка (читаем базу) -> Обновляем список
         } else {
             emitter.emit('database-repos-select-error')
         }
@@ -224,6 +232,27 @@ export class Database {
         emitter.on('database-get-sha', Database.fnGetSHADatabase)
         emitter.on('database-save', Database.fnWriteNotesDatabase)
 
+        emitter.on('database-article-list', Database.fnGetArticlesList)
+        emitter.on('database-article-list-filter', Database.fnFilterArticlesList)
+        emitter.on('database-catalog-article-list-filter', Database.fnFilterCatalogArticlesList)
+        emitter.on('database-article-update', Database.fnUpdateArticle)
+        emitter.on('database-article-remove', Database.fnRemoveArticle)
+        emitter.on('database-article-add', Database.fnCreateArticle)
+        emitter.on('database-article-select', Database.fnSelectArticle)
+
+        emitter.on('database-catalog-group-list', Database.fnGetGroupList)
+        emitter.on('database-catalog-group-list-filter', Database.fnFilterGroupList)
+        emitter.on('database-catalog-group-update', Database.fnUpdateGroup)
+        emitter.on('database-catalog-group-remove', Database.fnRemoveGroup)
+        emitter.on('database-catalog-group-add', Database.fnCreateGroup)
+        emitter.on('database-catalog-group-select', Database.fnSelectGroup)
+
+        emitter.on('database-catalog-category-list', Database.fnGetCategoryList)
+        emitter.on('database-catalog-category-list-filter', Database.fnFilterCategoryList)
+        emitter.on('database-catalog-category-update', Database.fnUpdateCategory)
+        emitter.on('database-catalog-category-remove', Database.fnRemoveCategory)
+        emitter.on('database-catalog-category-add', Database.fnCreateCategory)
+        emitter.on('database-catalog-category-select', Database.fnSelectCategory)
         // emitter.emit('database-repos-load')
     }
 
@@ -232,6 +261,7 @@ export class Database {
     static fnFirstLoadDatabase()
     {
         _s('Database.fnFirstLoadDatabase')
+
         // return Database
         //     // Нужно получить SHA и данные
         //     .fnGetNotesDatabase()
@@ -351,6 +381,134 @@ export class Database {
 
     // ===============================================================
 
+    static fnSelectArticle(sID)
+    {
+        Database.iSelectedArticle = sID
+        emitter.emit('database-catalog-article-selected', Database.iSelectedArticle)
+    }
+
+    static fnGetArticlesList()
+    {
+        _l('fnGetArticlesList')
+        emitter.emit('database-article-list-loaded', { 
+            aList: Database.oDatabase.articles, 
+            iSelectedArticle: Database.iSelectedArticle 
+        })
+    }
+
+    static fnFilterArticlesList(sFilter)
+    {
+        emitter.emit('database-article-list-filter-loaded', { 
+            aList: Database.fnFilterArticles(sFilter), 
+            iSelectedArticle: Database.iSelectedArticle 
+        })
+    }
+
+    static fnFilterCatalogArticlesList(sFilter)
+    {
+        emitter.emit('database-catalog-article-list-filter-loaded', { 
+            aList: Database.fnFilterCurrentArticles(sFilter), 
+            iSelectedArticle: Database.iSelectedArticle 
+        })
+    }
+
+    static fnUpdateArticle(iIndex, oItem)
+    {
+        
+    }
+
+    static fnRemoveArticle(iIndex)
+    {
+        
+    }
+
+    static fnCreateArticle()
+    {
+        
+    }
+
+    // ===============================================================
+
+    static fnSelectGroup(sID)
+    {
+        Database.iSelectedGroup = sID
+        emitter.emit('database-catalog-group-selected', Database.iSelectedGroup)
+    }
+
+    static fnGetGroupList()
+    {
+        _l('fnGetArticlesList')
+        emitter.emit('database-catalog-group-list-loaded', { 
+            aList: Database.oDatabase.groups, 
+            iSelectedArticle: Database.iSelectedArticle 
+        })
+    }
+
+    static fnFilterGroupList(sFilter)
+    {
+        emitter.emit('database-catalog-group-list-filter-loaded', { 
+            aList: Database.fnFilterGroups(sFilter), 
+            iSelectedArticle: Database.iSelectedArticle 
+        })
+    }
+
+    static fnUpdateGroup(iIndex, oItem)
+    {
+        
+    }
+
+    static fnRemoveGroup(iIndex)
+    {
+        
+    }
+
+    static fnCreateGroup()
+    {
+        
+    }
+
+    // ===============================================================
+
+    static fnSelectCategory(sID)
+    {
+        Database.iSelectedCategory = sID
+        emitter.emit('database-catalog-category-selected', Database.iSelectedCategory)
+    }
+
+    static fnGetCategoryList()
+    {
+        _l('fnGetArticlesList')
+        emitter.emit('database-catalog-category-list-loaded', { 
+            aList: Database.oDatabase.groups, 
+            iSelectedArticle: Database.iSelectedArticle 
+        })
+    }
+
+    static fnFilterCategoryList(sFilter)
+    {
+        emitter.emit('database-catalog-category-list-filter-loaded', { 
+            aList: Database.fnFilterCurrentCategories(sFilter), 
+            iSelectedArticle: Database.iSelectedArticle 
+        })
+    }
+
+    static fnUpdateCategory(iIndex, oItem)
+    {
+        
+    }
+
+    static fnRemoveCategory(iIndex)
+    {
+        
+    }
+
+    static fnCreateCategory()
+    {
+        
+    }
+
+    // ===============================================================
+
     static fnGetArticlePath(iID)
     {
         return `articles/${iID}.md`
@@ -366,6 +524,31 @@ export class Database {
     }
 
     // ===============================================================
+
+    static fnFilterCurrentCategories(sFilter)
+    {
+        return Database.oDatabase.categories.filter((oI) => ~oI.name.indexOf(sFilter) && oI.group_id == Database.iSelectedGroup)
+    }
+
+    static fnFilterCurrentArticles(sFilter)
+    {
+        return Database.oDatabase.articles.filter((oI) => ~oI.name.indexOf(sFilter) && oI.category_id == Database.iSelectedCategory)
+    }
+
+    static fnFilterGroups(sFilter)
+    {
+        return Database.oDatabase.groups.filter((oI) => ~oI.name.indexOf(sFilter))
+    }
+
+    static fnFilterCategories(sFilter)
+    {
+        return Database.oDatabase.categories.filter((oI) => ~oI.name.indexOf(sFilter))
+    }
+
+    static fnFilterArticles(sFilter)
+    {
+        return Database.oDatabase.articles.filter((oI) => ~oI.name.indexOf(sFilter))
+    }
 
     static fnGetCurrentCategory()
     {

@@ -14,32 +14,18 @@
           <a v-for="oMenuItem in aMenu" :key="oMenuItem.class" :class="(sCurrentMode==oMenuItem.class ? 'btn-primary' : '') + ' btn '+oMenuItem.class" :title="oMenuItem.title" @click="fnMenuItemClick(oMenuItem)"><i :class="'bi '+oMenuItem.icon"></i></a>
         </div>
         <div class="current-mode">
-          <template v-if="sCurrentMode=='app-mode-list'">
-            <ListMode/>
-          </template>
-          <template v-if="sCurrentMode=='app-mode-catalog'">
-            <CatalogMode/>
-          </template>
-          <template v-if="sCurrentMode=='app-mode-favorites'">
-            <FavoritesMode/>
-          </template>
-          <template v-if="sCurrentMode=='app-mode-tags'">
-            <TagsMode/>
-          </template>
-          <template v-if="sCurrentMode=='app-mode-links'">
-            <LinksMode/>
-          </template>
+          <ListMode v-show="sCurrentMode=='app-mode-list'" />
+          <CatalogMode v-show="sCurrentMode=='app-mode-catalog'"/>
+          <FavoritesMode v-show="sCurrentMode=='app-mode-favorites'"/>
+          <TagsMode v-show="sCurrentMode=='app-mode-tags'"/>
+          <LinksMode v-show="sCurrentMode=='app-mode-links'"/>
         </div>
     </div>
 
     <div class="page-panel"></div>
-    <template v-if="bShowErrorWindow">
-      <ErrorWindow/>
-    </template>
+    <ErrorWindow v-show="bShowErrorWindow"/>
 
-    <template v-if="bShowRepoWindow">
-      <AskAPIWindow/>
-    </template>
+    <AskAPIWindow v-show="bShowRepoWindow"/>
 </template>
 
 <script>

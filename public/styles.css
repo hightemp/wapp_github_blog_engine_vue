@@ -169,10 +169,15 @@ body, html {
 }
 
 .item-row {
-    display: grid;
+    display: grid !important;
     grid-template-columns: 32px 1fr;
     min-height: 25px;
     border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.item-row .list-group-item {
+    padding: 5px;
 }
 
 .item-row>* {
@@ -201,8 +206,8 @@ a {
 }
 
 .active .list-group-item {
-    background: blue;
-    color: white;
+    background: blue !important;
+    color: white !important;
 }
 
 .tree-spacer {

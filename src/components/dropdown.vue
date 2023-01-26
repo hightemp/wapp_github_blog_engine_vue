@@ -23,6 +23,7 @@ export default {
             this.bOpened = !this.bOpened
         },
         fnOnItemClick(oI) {
+            this.bOpened = false
             this.$emit('itemclick', oI)
         }
     }
