@@ -1,8 +1,8 @@
 <template>
     <div class="page-panel" v-show="bShowEditor">
         <div class="actions-panel page-actions-panel">
-            <button class="btn btn-success" id="page-save-btn"><i class="bi bi-save"></i></button>
-            <button class="btn btn-secondary" id="page-link-btn"><i class="bi bi-link-45deg"></i></button>
+            <button class="btn btn-success" id="page-save-btn" @click="fnSaveEditorContents"><i class="bi bi-save"></i></button>
+            <button class="btn btn-secondary" id="page-link-btn" @click="fnOpenLink"><i class="bi bi-link-45deg"></i></button>
             <!-- <input class="form-control" id="page-title"> -->
         </div>
         <ckeditor 
@@ -36,6 +36,7 @@ export default {
             sData: "",
             oArticle: null,
 
+            oEditor: null,
             oClassicEditor: Editor,
 
             oEditorConfig: {}
@@ -44,7 +45,7 @@ export default {
 
     methods: {
         onEditorReady(editor) {
-            if (editor)
+            this.oEditor = editor
             editor.editing.view.change( writer => {
                 writer.setStyle( 
                     'height', 
@@ -52,6 +53,15 @@ export default {
                     editor.editing.view.document.getRoot() 
                 );
             })
+        },
+        fnSaveEditorContents() {
+            var oThis = this;
+            emitter.emit('database-article-save-current-content', 
+                oThis.oEditor.getData()
+            )
+        },
+        fnOpenLink() {
+            
         }
     },
 
@@ -93,6 +103,14 @@ export default {
 
     created() {
         var oThis = this;
+
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                _l('CTRL + S');
+                oThis.fnSaveEditorContents()
+            }
+        });
 
         emitter.on('database-catalog-article-selected', (sID, oArticle) => {
             _l('database-catalog-article-selected', {sID, oArticle})

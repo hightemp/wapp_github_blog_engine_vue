@@ -289,3 +289,7 @@ a {
 .list-repo-item.active {
     border: 1px solid grey;
 }
+
+.toast-body {
+    text-align: left;
+}

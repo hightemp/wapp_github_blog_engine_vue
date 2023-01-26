@@ -27,6 +27,8 @@
     <ErrorWindow v-show="bShowErrorWindow"/>
 
     <AskAPIWindow v-show="bShowRepoWindow"/>
+
+    <SavedToast/>
 </template>
 
 <script>
@@ -40,6 +42,7 @@ import ErrorWindow from "./components/windows/error.vue"
 import AskAPIWindow from "./components/windows/ask_api.vue"
 
 import PageEditor from "./components/editor.vue"
+import SavedToast from "./components/toasts/saved.vue"
 
 import { Database } from "./Database"
 
@@ -57,7 +60,8 @@ export default {
     LinksMode,
     ErrorWindow,
     AskAPIWindow,
-    PageEditor
+    PageEditor,
+    SavedToast
   },
 
   data() {

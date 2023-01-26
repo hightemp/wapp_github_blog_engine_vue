@@ -239,6 +239,7 @@ export class Database {
         emitter.on('database-article-remove', Database.fnRemoveArticle)
         emitter.on('database-article-add', Database.fnCreateArticle)
         emitter.on('database-article-select', Database.fnSelectArticle)
+        emitter.on('database-article-save-current-content', Database.fnSaveCurrentArticle)
 
         emitter.on('database-catalog-group-list', Database.fnGetGroupList)
         emitter.on('database-catalog-group-list-filter', Database.fnFilterGroupList)
@@ -386,7 +387,7 @@ export class Database {
         Database.sSelectedArticleID = sID
         emitter.emit('database-catalog-article-selected', 
             Database.sSelectedArticleID, 
-            Database.oDatabase.articles[Database.sSelectedArticleID]
+            Database.fnGetCurrentArticle()
         )
     }
 
@@ -428,6 +429,13 @@ export class Database {
     static fnCreateArticle()
     {
         
+    }
+
+    static fnSaveCurrentArticle(sContent)
+    {
+        var oA = Database.fnGetCurrentArticle()
+        oA.html = sContent
+        emitter.emit('database-article-saved')
     }
 
     // ===============================================================
@@ -555,12 +563,12 @@ export class Database {
 
     static fnGetCurrentCategory()
     {
-        return Database.oDatabase.categories.find((oI) => oI.id==ModeCatalogController.sCatalogCategoryID)
+        return Database.oDatabase.categories.find((oI) => oI.id==Database.iCategoryID)
     }
 
     static fnGetCurrentArticle()
     {
-        return Database.oDatabase.articles.find((oI) => oI.id==ModeCatalogController.sArticleID)
+        return Database.oDatabase.articles.find((oI) => oI.id==Database.sSelectedArticleID)
     }
 
     static fnFilterCategoriesByGroup(iGroupID)
