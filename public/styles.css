@@ -103,11 +103,6 @@ body, html {
     border-right: 1px solid #eee;
 }
 
-.page-panel {
-    height: 100%;
-    max-height: 100%;
-}
-
 #page-edit {
     height: 100%;
 }
@@ -136,6 +131,9 @@ body, html {
 }
 
 .page-panel {
+    text-align: left;
+    height: 100%;
+    max-height: 100%;
     border-left: 1px solid #eee;
     grid-area: d;
 }

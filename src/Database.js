@@ -11,7 +11,7 @@ export class Database {
     ]
 
     static iSelectedRepo = null
-    static iSelectedArticle = null
+    static sSelectedArticleID = null
     static iSelectedCategory = null
     static iSelectedGroup = null
     static iSelectedTag = null
@@ -383,8 +383,11 @@ export class Database {
 
     static fnSelectArticle(sID)
     {
-        Database.iSelectedArticle = sID
-        emitter.emit('database-catalog-article-selected', Database.iSelectedArticle)
+        Database.sSelectedArticleID = sID
+        emitter.emit('database-catalog-article-selected', 
+            Database.sSelectedArticleID, 
+            Database.oDatabase.articles[Database.sSelectedArticleID]
+        )
     }
 
     static fnGetArticlesList()
@@ -392,7 +395,7 @@ export class Database {
         _l('fnGetArticlesList')
         emitter.emit('database-article-list-loaded', { 
             aList: Database.oDatabase.articles, 
-            iSelectedArticle: Database.iSelectedArticle 
+            sSelectedArticleID: Database.sSelectedArticleID 
         })
     }
 
@@ -400,7 +403,7 @@ export class Database {
     {
         emitter.emit('database-article-list-filter-loaded', { 
             aList: Database.fnFilterArticles(sFilter), 
-            iSelectedArticle: Database.iSelectedArticle 
+            sSelectedArticleID: Database.sSelectedArticleID 
         })
     }
 
@@ -408,7 +411,7 @@ export class Database {
     {
         emitter.emit('database-catalog-article-list-filter-loaded', { 
             aList: Database.fnFilterCurrentArticles(sFilter), 
-            iSelectedArticle: Database.iSelectedArticle 
+            sSelectedArticleID: Database.sSelectedArticleID 
         })
     }
 
@@ -440,7 +443,7 @@ export class Database {
         _l('fnGetArticlesList')
         emitter.emit('database-catalog-group-list-loaded', { 
             aList: Database.oDatabase.groups, 
-            iSelectedArticle: Database.iSelectedArticle 
+            sSelectedArticleID: Database.sSelectedArticleID 
         })
     }
 
@@ -448,7 +451,7 @@ export class Database {
     {
         emitter.emit('database-catalog-group-list-filter-loaded', { 
             aList: Database.fnFilterGroups(sFilter), 
-            iSelectedArticle: Database.iSelectedArticle 
+            sSelectedArticleID: Database.sSelectedArticleID 
         })
     }
 
@@ -480,7 +483,7 @@ export class Database {
         _l('fnGetArticlesList')
         emitter.emit('database-catalog-category-list-loaded', { 
             aList: Database.oDatabase.groups, 
-            iSelectedArticle: Database.iSelectedArticle 
+            sSelectedArticleID: Database.sSelectedArticleID 
         })
     }
 
@@ -488,7 +491,7 @@ export class Database {
     {
         emitter.emit('database-catalog-category-list-filter-loaded', { 
             aList: Database.fnFilterCurrentCategories(sFilter), 
-            iSelectedArticle: Database.iSelectedArticle 
+            sSelectedArticleID: Database.sSelectedArticleID 
         })
     }
 

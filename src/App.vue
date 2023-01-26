@@ -20,9 +20,10 @@
           <TagsMode v-show="sCurrentMode=='app-mode-tags'"/>
           <LinksMode v-show="sCurrentMode=='app-mode-links'"/>
         </div>
+
+        <PageEditor/>
     </div>
 
-    <div class="page-panel"></div>
     <ErrorWindow v-show="bShowErrorWindow"/>
 
     <AskAPIWindow v-show="bShowRepoWindow"/>
@@ -38,9 +39,13 @@ import LinksMode from "./components/modes/links.vue"
 import ErrorWindow from "./components/windows/error.vue"
 import AskAPIWindow from "./components/windows/ask_api.vue"
 
+import PageEditor from "./components/editor.vue"
+
 import { Database } from "./Database"
 
 import { emitter } from "./EventBus"
+
+// import Editor from "./ckeditor5-36.0.0-aw402xfhqssx/src/ckeditor"
 
 export default {
   name: 'App',
@@ -52,6 +57,7 @@ export default {
     LinksMode,
     ErrorWindow,
     AskAPIWindow,
+    PageEditor
   },
 
   data() {
@@ -96,6 +102,10 @@ export default {
     fnShowRepoWindow() {
       this.bShowRepoWindow = true
     }
+  },
+
+  mounted() {
+    var oThis = this
   },
 
   created() {
