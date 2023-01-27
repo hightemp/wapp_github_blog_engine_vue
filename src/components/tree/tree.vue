@@ -14,16 +14,20 @@ import TreeList from "./list.vue"
 
 export default {
     name: 'Tree',
+
     components:{
         TreeList
     },
+
+    emits: ["clickitem"],
+
     props: {
         parent: {
             type: Number,
             default: 0
         },
         list: Array, 
-        selected: String,
+        selected: [String, Number, null],
         level: {
             type: Number,
             default: 0

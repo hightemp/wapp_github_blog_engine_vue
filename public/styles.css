@@ -192,8 +192,8 @@ body, html {
 
 .item-title {
     align-items: center;
-    display: flex;
-    padding: 5px;    
+    display: flex !important;
+    padding-left: 5px !important;
 }
 
 .item-tree-row .item-inner-title {

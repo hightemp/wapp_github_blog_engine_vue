@@ -6,7 +6,7 @@
             <Dropdown :items="aGroupDropdownMenu" />
         </div>
         <div class="list">
-            <template v-for="(oI, iI) in aGroupList" v-key="oI.id">
+            <template v-for="(oI, iI) in aGroupList" :key="oI.id">
                 <div :class="'input-group item-row '+(oI.id == sGroupSelectedID ? 'active' : '')" @click="fnSelectGroup(oI.id)">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
@@ -28,6 +28,8 @@
         <div class="list">
             <TreeList 
                 :list="aCategoryList" 
+                :parent="0"
+                :level="0"
                 :selected="sCategorySelectedID"
                 @clickitem="fnSelectCategory"
             />

@@ -1,27 +1,11 @@
 <template>
-    <template v-for="oI in aList" v-key="oI.id">
-        <div 
-            :class="'input-group item-tree-row '+(oI.id == sSelectedID ? 'active' : '')"
-            @click="fnSelectItem(oI)" 
-            v-if="oI.parent_id*1 == parent*1"
-        >
-            <div class="input-group-text">
-                <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
-            </div>
-            <div class="input-group-text item-flag-group"><a class="item-flag" @click="fnToggleItem(oI)"><i class="bi bi-dash-square" v-show="oI.is_opened"></i><i class="bi bi-plus-square" v-show="!oI.is_opened"></i></a></div>
-            <a 
-                :class="'list-group-item list-group-item-action item-title '" 
-            >
-                <div class="tree-spacer" v-for="iI in iLevel" v-key="iI"></div>
-                <div class="item-inner-title">{{oI.name}}</div>
-            </a>
-        </div>
-        <Tree 
-            v-if="oI.parent_id*1 == parent*1 && oI.is_opened"
+    <template v-for="(oItem, iI) in aList" :key="oItem.id">
+        <TreeItem
+            :item="oItem"
             :parent="sParent" 
             :list="aList" 
             :selected="sSelectedID" 
-            :level="iLevel+1"
+            :level="iLevel"
             @clickitem="fnSelectItem"
         />
     </template>
@@ -29,14 +13,16 @@
 
 <script>
 
-import Tree from './tree.vue'
+import TreeItem from './item.vue'
 
 export default {
     name: 'TreeList',
 
     components: {
-        Tree
+        TreeItem
     },
+
+    emits: ["clickitem"],
 
     props: {
         parent: {
@@ -44,7 +30,7 @@ export default {
             default: 0
         },
         list: Array, 
-        selected: String,
+        selected: [String, Number, null],
         level: {
             type: Number,
             default: 0
@@ -69,9 +55,6 @@ export default {
             _l({oI})
             this.$emit('clickitem', oI)
         },
-        fnToggleItem(oI) {
-            oI.is_opened = !oI.is_opened
-        }
     }
 }
 </script>

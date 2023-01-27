@@ -6,7 +6,7 @@
             <Dropdown :items="aDropdownMenu" />
         </div>
         <div class="list">
-            <template v-for="(oI, iI) in aFavList" v-key="oI.id">
+            <template v-for="(oI, iI) in aFavList" :key="oI.id">
                 <div :class="'input-group item-row '+(oI.id == sFavSelectedID ? 'active' : '')" @click="fnSelect(oI.id)">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
