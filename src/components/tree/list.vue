@@ -52,7 +52,6 @@ export default {
 
     methods: {
         fnSelectItem(oI) {
-            _l({oI})
             this.$emit('clickitem', oI)
         },
     }

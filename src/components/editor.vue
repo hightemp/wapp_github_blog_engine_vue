@@ -12,6 +12,7 @@
             ref="editorjs"
             style="height: 100%"
             @ready="onEditorReady"
+            @input="onEditorInput"
         ></ckeditor>
     </div>
 </template>
@@ -45,6 +46,7 @@ export default {
 
     methods: {
         onEditorReady(editor) {
+            _l('onEditorReady')
             this.oEditor = editor
             editor.editing.view.change( writer => {
                 writer.setStyle( 
@@ -54,14 +56,19 @@ export default {
                 );
             })
         },
+        onEditorInput() {
+            this.fnSaveEditorContents()
+        },
         fnSaveEditorContents() {
             var oThis = this;
-            emitter.emit('database-article-save-current-content', 
-                oThis.oEditor.getData()
-            )
+            if (oThis.oEditor) {
+                emitter.emit('database-article-save-current-content', 
+                    oThis.oEditor.getData()
+                )
+            }
         },
         fnOpenLink() {
-            
+            emitter.emit('database-article-open-url')
         }
     },
 
@@ -103,14 +110,6 @@ export default {
 
     created() {
         var oThis = this;
-
-        document.addEventListener('keydown', e => {
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                _l('CTRL + S');
-                oThis.fnSaveEditorContents()
-            }
-        });
 
         emitter.on('database-catalog-article-selected', (sID, oArticle) => {
             _l('database-catalog-article-selected', {sID, oArticle})

@@ -2,7 +2,7 @@
 <div>
     <div class="block-overlay"></div>
 
-    <div class="modal" id="modal-error" tabindex="-1">
+    <div class="modal fade show" id="modal-error" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -25,10 +25,10 @@
 import { emitter } from '../../EventBus'
 
 export default {
-    props: {
-        message: String,
-        title: String,
-    },
+    props: [
+        'message',
+        'title'
+    ],
 
     methods: {
         fnCloseErrorWindow() {

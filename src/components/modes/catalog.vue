@@ -144,7 +144,6 @@ export default {
         },
         fnSelectCategory(oID)
         {
-            _l({oID})
             emitter.emit('database-catalog-category-select', oID.id)
         },
         fnSelectArticle(sID)

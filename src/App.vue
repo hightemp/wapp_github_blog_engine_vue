@@ -24,7 +24,7 @@
         <PageEditor/>
     </div>
 
-    <ErrorWindow message="sErrorWindowMessage" title="sErrorWindowTitle" v-show="bShowErrorWindow"/>
+    <ErrorWindow :message="sErrorWindowMessage" :title="sErrorWindowTitle" v-show="bShowErrorWindow"/>
 
     <AskAPIWindow v-show="bShowRepoWindow"/>
 
@@ -136,11 +136,19 @@ export default {
     })
 
     emitter.on('database-git-load-error-notfound', () => {
+      oThis.bShowErrorWindow = true
       oThis.sErrorWindowTitle = "Важно"
       oThis.sErrorWindowMessage = "База заметок не бфла найдена. И была создана новая."
     })
 
     emitter.on('database-git-load-error-github-exception', (aAnsw) => {
+      oThis.bShowErrorWindow = true
+      oThis.sErrorWindowTitle = "Ошибка"
+      oThis.sErrorWindowMessage = aAnsw[0]
+    })
+
+    emitter.on('database-git-save-error', (aAnsw) => {
+      oThis.bShowErrorWindow = true
       oThis.sErrorWindowTitle = "Ошибка"
       oThis.sErrorWindowMessage = aAnsw[0]
     })
@@ -155,6 +163,14 @@ export default {
         oThis.oRepo = null
       }
     })
+
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.key === 's') {
+          e.preventDefault();
+          _l('CTRL + S');
+          emitter.emit('database-git-save')
+      }
+    });
   }
 }
 </script>

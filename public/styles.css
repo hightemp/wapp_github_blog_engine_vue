@@ -190,6 +190,14 @@ body, html {
     text-align: left;
 }
 
+.item-row:hover {
+    background: rgba(0,0,0,0.1);
+}
+
+.item-tree-row:hover {
+    background: rgba(0,0,0,0.1);
+}
+
 .item-title {
     align-items: center;
     display: flex !important;
@@ -291,7 +299,8 @@ a {
 }
 
 .list-repo-item.active {
-    border: 1px solid grey;
+    background: blue;
+    color: white;
 }
 
 .toast-body {
