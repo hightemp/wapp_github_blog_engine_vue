@@ -183,10 +183,11 @@ body, html {
 }
 
 .item-tree-row {
-    display: grid;
+    display: grid !important;
     grid-template-columns: 32px 32px 1fr;
     min-height: 25px;
     border-bottom: 1px solid #eee;
+    text-align: left;
 }
 
 .item-title {
@@ -195,8 +196,11 @@ body, html {
     padding: 5px;    
 }
 
-.item-inner-title {
-
+.item-tree-row .item-inner-title {
+    align-items: center;
+    padding: 3px;
+    display: flex;
+    height: 100%;
 }
 
 a {

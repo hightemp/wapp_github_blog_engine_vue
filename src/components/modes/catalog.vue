@@ -26,7 +26,12 @@
             <Dropdown :items="aCategoryDropdownMenu" />
         </div>
         <div class="list">
-            <template v-for="(oI, iI) in aCategoryList" v-key="oI.id">
+            <TreeList 
+                :list="aCategoryList" 
+                :selected="sCategorySelectedID"
+                @clickitem="fnSelectCategory"
+            />
+            <!-- <template v-for="(oI, iI) in aCategoryList" v-key="oI.id">
                 <div :class="'input-group item-row '+(oI.id == sCategorySelectedID ? 'active' : '')" @click="fnSelectCategory(oI.id)">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
@@ -37,7 +42,7 @@
                         <div class="item-inner-title">{{oI.name}}</div>
                     </a>
                 </div>
-            </template>
+            </template> -->
         </div>
     </div>
     <div class="articles-panel">
@@ -65,6 +70,8 @@
 
 <script>
 
+import TreeList from "../tree/list.vue"
+
 import Dropdown from "../dropdown.vue"
 
 import { emitter } from "../../EventBus"
@@ -73,7 +80,8 @@ export default {
     name: 'CatalogMode',
 
     components: {
-        Dropdown
+        Dropdown,
+        TreeList
     },
 
     data() {
@@ -132,9 +140,10 @@ export default {
         {
             emitter.emit('database-catalog-group-select', sID)
         },
-        fnSelectCategory(sID)
+        fnSelectCategory(oID)
         {
-            emitter.emit('database-catalog-category-select', sID)
+            _l({oID})
+            emitter.emit('database-catalog-category-select', oID.id)
         },
         fnSelectArticle(sID)
         {
