@@ -78,13 +78,13 @@ export default {
             emitter.emit('database-article-list-filter', '')
         })
 
-        emitter.on('database-article-list-filter-loaded', ({aList, iSelectedArticle}) => {
+        emitter.on('database-article-list-filter-loaded', ({aList, sSelectedArticleID}) => {
             oThis.aList = aList
-            oThis.sSelectedID = iSelectedArticle
+            oThis.sSelectedID = sSelectedArticleID
         })
-        // emitter.on('database-article-list-loaded', ({aList, iSelectedArticle}) => {
+        // emitter.on('database-article-list-loaded', ({aList, sSelectedArticleID}) => {
         //     oThis.aList = aList
-        //     oThis.sSelectedID = iSelectedArticle
+        //     oThis.sSelectedID = sSelectedArticleID
         //     _l('>>>database-article-list-loaded', {aList})
         // })
 

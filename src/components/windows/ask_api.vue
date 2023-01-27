@@ -140,7 +140,7 @@ export default {
         emitter.on('database-repos-loaded', ({aList, iSelectedRepoIndex}) => {
             oThis.aList = aList
             oThis.iSelectedRepoIndex = iSelectedRepoIndex
-            // _l('>>>loaded', {aList, o:oThis.aList})
+            _l('>>>loaded', {aList, o:oThis.aList})
         })
 
         emitter.on('database-repos-saved', () => {

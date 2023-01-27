@@ -15,37 +15,40 @@ export class Database {
     static iSelectedCategory = null
     static iSelectedGroup = null
     static iSelectedTag = null
+    static iSelectedLink = null
 
     static oDatabase = {
-        "groups_last_id": "0",
+        "groups_last_id": 0,
         "groups": [],
-        "categories_last_id": "0",
+        "categories_last_id": 0,
         "categories": [],
-        "articles_last_id": "0",
+        "articles_last_id": 0,
         "articles": [],
-        "favorites_last_id": "0",
+        "favorites_last_id": 0,
         "favorites": [],
-        "tags_last_id": "0",
+        "tags_last_id": 0,
         "tags": [],
-        "tags_relataions_last_id": "1",
-        "tags_relations": []
+        "tags_relataions_last_id": 0,
+        "tags_relations": [],
+        "links_last_id": 0,
+        "links": [],
     }
 
     static oDefaultDatabase = {
-        "groups_last_id": "3",
+        "groups_last_id": 3,
         "groups": [
             {"id":1, "name": "Test 1"},
             {"id":2, "name": "Test 2"},
             {"id":3, "name": "Test 3"},
         ],
-        "categories_last_id": "4",
+        "categories_last_id": 4,
         "categories": [
             {"id":1, "name": "Test 1", "is_opened": false, "parent_id": null, "group_id": "1"},
             {"id":2, "name": "Test 2", "is_opened": false, "parent_id": "1", "group_id": "1"},
             {"id":3, "name": "Test 3", "is_opened": false, "parent_id": "2", "group_id": "1"},
             {"id":4, "name": "Test 4", "is_opened": false, "parent_id": null, "group_id": "1"},
         ],
-        "articles_last_id": "6",
+        "articles_last_id": 6,
         "articles": [
             {"id":1, "name": "Test 1", "category_id": "1", "html": "<b>Banken, die die auf internationaler Ebene hat</b> der Ausschuss eine Reihe einheitlicher Kennzahlen entwickelt, dies als das Minimum hinaus betreffen. Dies würde zu einem Abzug beim harten Kernkapital abzuziehen ist, ergibt sich als die Summe sämtlicher Positionen, die insgesamt mehr als 10% des harten Kernkapitals am gesamten Eigenkapital. Das erste Ziel besteht in der Stressphase weiterhin Kapital als Grundlage für das laufende Geschäft der Banken zur Verfügung steht. Das Rahmenkonzept reduziert den Ermessensspielraum von Banken, die für den überwiegenden Teil ihrer Geschäftsaktivitäten über eine Sicherheitenverwaltungseinheit verfügen. Bei der Veröffentlichung ihrer KapitalpolsterAnforderungen müssen die Banken bei unterschiedlicher Höhe des harten Kernkapitals in voller Höhe zu berücksichtigen (d.h. Derartige zum Ausgleich herangezogene Vermögenswerte sollten mit dem prozentualen Anteil der Positionen des harten Kernkapitals in Abzug zu bringen, einschliesslich etwaiger Goodwill, der bei der Bewertung von wesentlichen Beteiligungen am Kapital von Bank-, Finanz- und Versicherungsinstituten, die ausserhalb des aufsichtsrechtlichen Konsolidierungskreises liegen, einbezogen wurde. Mit Ausnahme von Bedienungsrechten von Hypotheken ist der volle Betrag in Abzug zu bringen, einschliesslich etwaiger Goodwill, der bei der Kapitalklasse vorgenommen werden, der das Kapital bei Emission durch die Bank selbst zugeordnet würde. Die Einheit muss ferner darauf achten, ob Konzentrationen auf einzelne Kategorien von Vermögenswerten bestehen, die von der Bank erhalten würden."},
             {"id":2, "name": "Test 2", "category_id": "1", "html": "dfasdf"},
@@ -54,25 +57,32 @@ export class Database {
             {"id":5, "name": "Derartige zum Ausgleich", "category_id": "2", "html": "sadf asfdasf asdf"},
             {"id":6, "name": "der bei der Kapitalklasse vorgenommen werden", "category_id": "3", "html": "sadf asfdasf asdf"},
         ],
-        "favorites_last_id": "1",
+        "favorites_last_id": 1,
         "favorites": [
             {"id":1, "article_id":"1"},
         ],
-        "tags_last_id": "4",
+        "tags_last_id": 4,
         "tags": [
             {"id":1, "name":"computer"},
             {"id":2, "name":"testing"},
             {"id":3, "name":"development"},
             {"id":4, "name":"lorem"},
         ],
-        "tags_relataions_last_id": "1",
+        "tags_relataions_last_id": 1,
         "tags_relations": [
-            {"id":1, "tag_id":"1", "article_id":"1"},
-        ]
+            {"id":1, "tag_id":1, "article_id":1},
+        ],
+        "links_last_id": 4,
+        "links": [
+            {"id":1, "name":"test link 1", "url":"https://www.youtube.com/watch?v=7HysFi1NHdI"},
+            {"id":2, "name":"test link 2", "url":"https://www.youtube.com/watch?v=7HysFi1NHdI"},
+            {"id":3, "name":"test link 3", "url":"https://www.youtube.com/watch?v=7HysFi1NHdI"},
+            {"id":4, "name":"test link 4", "url":"https://www.youtube.com/watch?v=7HysFi1NHdI"},
+        ],
     }
 
     static {
-        Database.oDatabase = Database.oDefaultDatabase
+        // Database.oDatabase = Database.oDefaultDatabase
     }
 
     // NOTE: Константы
@@ -87,9 +97,28 @@ export class Database {
     static octokit = null
 
     // NOTE: Переменные - Данные
-    static sLogin = ''
-    static sRepo = ''
-    static sAPIKey = ''
+
+    // ===============================================================
+
+    static get sLogin() {
+        return Database.aReposList[Database.iSelectedRepo].login
+    }
+
+    static get sRepo() {
+        return Database.aReposList[Database.iSelectedRepo].repo
+    }
+
+    static get sAPIKey() {
+        return Database.aReposList[Database.iSelectedRepo].key
+    }
+
+    // static get octokit() {
+    //     Database._octokit = new Octokit({
+    //         auth: Database.sAPIKey,
+    //     });
+
+    //     return Database._octokit
+    // }
 
     // ===============================================================
 
@@ -107,7 +136,7 @@ export class Database {
 
     static fnUpdateRepo(iRepoIndex, oItem)
     {
-        Database.aReposList = Database.aReposList || []
+        // Database.aReposList = Database.aReposList || []
         _l(">>", {aArgs:arguments})
         if (iRepoIndex==-1) {
             Database.aReposList.push(oItem)
@@ -140,6 +169,9 @@ export class Database {
         if (Database.aReposList[iRepoIndex]) {
             Database.iSelectedRepo = iRepoIndex
             _l('fnSelectRepo')
+
+            Database.fnInitGit()
+
             emitter.emit('database-repos-selected')
             emitter.emit('database-repos-save')
 
@@ -235,6 +267,8 @@ export class Database {
         emitter.on('database-article-list', Database.fnGetArticlesList)
         emitter.on('database-article-list-filter', Database.fnFilterArticlesList)
         emitter.on('database-catalog-article-list-filter', Database.fnFilterCatalogArticlesList)
+        emitter.on('database-tag-article-list-filter', Database.fnFilterTagArticlesList)
+        emitter.on('database-favorites-article-list-filter', Database.fnFilterFavoritesArticlesList)
         emitter.on('database-article-update', Database.fnUpdateArticle)
         emitter.on('database-article-remove', Database.fnRemoveArticle)
         emitter.on('database-article-add', Database.fnCreateArticle)
@@ -254,6 +288,30 @@ export class Database {
         emitter.on('database-catalog-category-remove', Database.fnRemoveCategory)
         emitter.on('database-catalog-category-add', Database.fnCreateCategory)
         emitter.on('database-catalog-category-select', Database.fnSelectCategory)
+
+        emitter.on('database-tag-list', Database.fnGetTagList)
+        emitter.on('database-tag-list-filter', Database.fnFilterTagList)
+        emitter.on('database-tag-update', Database.fnUpdateTag)
+        emitter.on('database-tag-remove', Database.fnRemoveTag)
+        emitter.on('database-tag-add', Database.fnCreateTag)
+        emitter.on('database-tag-select', Database.fnSelectTag)
+
+        emitter.on('database-favorites-update', Database.fnUpdateFavorites)
+        emitter.on('database-favorites-remove', Database.fnRemoveFavorites)
+        emitter.on('database-favorites-add', Database.fnCreateFavorites)
+        emitter.on('database-favorites-select', Database.fnSelectFavorites)
+
+        emitter.on('database-link-list', Database.fnGetLinkList)
+        emitter.on('database-link-list-filter', Database.fnFilterLinkList)
+        emitter.on('database-link-update', Database.fnUpdateLink)
+        emitter.on('database-link-remove', Database.fnRemoveLink)
+        emitter.on('database-link-add', Database.fnCreateLink)
+        emitter.on('database-link-select', Database.fnSelectLink)
+
+        emitter.on('database-repos-selected', Database.fnGetNotesDatabase)
+        emitter.on('database-git-load', Database.fnGetNotesDatabase)
+        emitter.on('database-git-save', Database.fnWriteNotesDatabase)
+
         // emitter.emit('database-repos-load')
     }
 
@@ -311,18 +369,19 @@ export class Database {
         }).then(({ data }) => {
             _l('fnGetNotesDatabase', data)
             Database.oDatabase = JSON.parse(decode(data.content))
+            Database.oDatabase = Database.oDefaultDatabase
             Database.SHA = data.sha
             _l('fnGetNotesDatabase', Database.oDatabase)
-            emitter.emit('database-loaded')
-        }).catch(() => {
-            emitter.emit('database-load-error', aAnsw)
+            emitter.emit('database-git-loaded')
+        }).catch((...aAnsw) => {
+            emitter.emit('database-git-load-error', aAnsw)
 
             if (/Not Found/.test(aAnsw[0])) {
-                emitter.emit('database-load-error-notfound', aAnsw)
-                
-                emitter.emit('database-save')
+                emitter.emit('database-git-load-error-notfound', aAnsw)
+
+                emitter.emit('database-git-save')
             } else {
-                emitter.emit('database-load-error-github-exception', aAnsw)
+                emitter.emit('database-git-load-error-github-exception', aAnsw)
             }
         })
     }
@@ -341,10 +400,10 @@ export class Database {
             content: encode(sData)
         })
         .then(() => {
-            emitter.emit('database-save-success')
+            emitter.emit('database-git-saved')
         })
         .catch(() => {
-            emitter.emit('database-save-error')
+            emitter.emit('database-git-save-error')
         })
     }
 
@@ -416,6 +475,14 @@ export class Database {
         })
     }
 
+    static fnFilterTagArticlesList(sFilter)
+    {
+        emitter.emit('database-tag-article-list-filter-loaded', { 
+            aList: Database.fnFilterCurrentTagsArticles(sFilter), 
+            sSelectedArticleID: Database.sSelectedArticleID 
+        })
+    }
+
     static fnUpdateArticle(iIndex, oItem)
     {
         
@@ -435,6 +502,7 @@ export class Database {
     {
         var oA = Database.fnGetCurrentArticle()
         oA.html = sContent
+        emitter.emit('database-git-save')
         emitter.emit('database-article-saved')
     }
 
@@ -520,6 +588,117 @@ export class Database {
 
     // ===============================================================
 
+    static fnSelectTag(sID)
+    {
+        Database.iSelectedTag = sID
+        emitter.emit('database-tag-selected', Database.iSelectedTag)
+    }
+
+    static fnGetTagList()
+    {
+        _l('fnGetArticlesList')
+        emitter.emit('database-tag-list-loaded', { 
+            aList: Database.oDatabase.tags, 
+            sSelectedArticleID: Database.sSelectedTag 
+        })
+    }
+
+    static fnFilterTagList(sFilter)
+    {
+        emitter.emit('database-tag-list-filter-loaded', { 
+            aList: Database.fnFilterTags(sFilter), 
+            sSelectedArticleID: Database.sSelectedTag 
+        })
+    }
+
+    static fnUpdateTag(iIndex, oItem)
+    {
+        
+    }
+
+    static fnRemoveTag(iIndex)
+    {
+        
+    }
+
+    static fnCreateTag()
+    {
+        
+    }
+
+    // ===============================================================
+
+    static fnSelectFavorites(sID)
+    {
+        Database.sSelectedArticleID = sID
+        emitter.emit('database-tag-selected', Database.sSelectedArticleID)
+    }
+
+    static fnFilterFavoritesArticlesList(sFilter)
+    {
+        emitter.emit('database-favorites-article-list-filter-loaded', { 
+            aList: Database.fnFilterFavorites(sFilter), 
+            sSelectedArticleID: Database.sSelectedArticleID 
+        })
+    }
+
+    static fnUpdateFavorites(iIndex, oItem)
+    {
+        
+    }
+
+    static fnRemoveFavorites(iIndex)
+    {
+        
+    }
+
+    static fnCreateFavorites()
+    {
+        
+    }
+
+    // ===============================================================
+
+    static fnSelectLink(sID)
+    {
+        Database.iSelectedLink = sID
+        emitter.emit('database-link-selected', Database.iSelectedLink)
+    }
+
+    static fnGetLinkList()
+    {
+        _l('fnGetArticlesList')
+        emitter.emit('database-link-list-loaded', { 
+            aList: Database.oDatabase.links, 
+            sSelectedArticleID: Database.iSelectedLink 
+        })
+    }
+
+    static fnFilterLinkList(sFilter)
+    {
+        emitter.emit('database-link-list-filter-loaded', { 
+            aList: Database.fnFilterLinks(sFilter), 
+            sSelectedArticleID: Database.iSelectedLink 
+        })
+    }
+
+    static fnUpdateLink(iIndex, oItem)
+    {
+        
+    }
+
+    static fnRemoveLink(iIndex)
+    {
+        
+    }
+
+    static fnCreateLink()
+    {
+        
+    }
+
+    // ===============================================================
+
     static fnGetArticlePath(iID)
     {
         return `articles/${iID}.md`
@@ -544,6 +723,41 @@ export class Database {
     static fnFilterCurrentArticles(sFilter)
     {
         return Database.oDatabase.articles.filter((oI) => ~oI.name.indexOf(sFilter) && oI.category_id == Database.iSelectedCategory)
+    }
+
+    static fnGetFavorites()
+    {
+        return Database.oDatabase.articles.filter((oI) => ~Database.oDatabase.favorites.findIndex((oFI) => oI.id == oFI.id))
+    }
+
+    static fnFilterFavorites(sFilter)
+    {
+        return Database.fnGetFavorites().filter((oI) => ~oI.name.indexOf(sFilter))
+    }
+
+    static fnFilterLinks(sFilter)
+    {
+        return Database.oDatabase.links.filter((oI) => ~oI.name.indexOf(sFilter))
+    }
+
+    static fnGetTagsArticles(sTagID)
+    {
+        return Database.oDatabase.articles.filter((oI) => ~Database.oDatabase.tags_relations.findIndex((oFI) => oI.id == oFI.article_id && oFI.tag_id == sTagID))
+    }
+
+    static fnFilterTagsArticles(sTagID, sFilter)
+    {
+        return Database.fnGetTagsArticles(sTagID).filter((oI) => ~oI.name.indexOf(sFilter))
+    }
+
+    static fnFilterCurrentTagsArticles(sFilter)
+    {
+        return Database.fnFilterTagsArticles(Database.iSelectedTag, sFilter)
+    }
+
+    static fnFilterTags(sFilter)
+    {
+        return Database.oDatabase.tags.filter((oI) => ~oI.name.indexOf(sFilter))
     }
 
     static fnFilterGroups(sFilter)

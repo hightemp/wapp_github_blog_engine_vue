@@ -24,7 +24,7 @@
         <PageEditor/>
     </div>
 
-    <ErrorWindow v-show="bShowErrorWindow"/>
+    <ErrorWindow message="sErrorWindowMessage" title="sErrorWindowTitle" v-show="bShowErrorWindow"/>
 
     <AskAPIWindow v-show="bShowRepoWindow"/>
 
@@ -70,7 +70,8 @@ export default {
       oRepo: null,
 
       bShowErrorWindow: false,
-      sErrorWindowMesssage: "",
+      sErrorWindowMessage: "",
+      sErrorWindowTitle: "",
 
       bShowRepoWindow: true,
 
@@ -132,6 +133,16 @@ export default {
 
     emitter.on('repo-window-close', () => {
       oThis.bShowRepoWindow = false
+    })
+
+    emitter.on('database-git-load-error-notfound', () => {
+      oThis.sErrorWindowTitle = "Важно"
+      oThis.sErrorWindowMessage = "База заметок не бфла найдена. И была создана новая."
+    })
+
+    emitter.on('database-git-load-error-github-exception', (aAnsw) => {
+      oThis.sErrorWindowTitle = "Ошибка"
+      oThis.sErrorWindowMessage = aAnsw[0]
     })
 
     emitter.on('database-repos-loaded', ({aList, iSelectedRepoIndex}) => {

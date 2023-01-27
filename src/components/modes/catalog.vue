@@ -167,38 +167,20 @@ export default {
             emitter.emit('database-catalog-article-list-filter', '')
         })
 
-        emitter.on('database-catalog-group-list-filter-loaded', ({aList, iSelectedArticle}) => {
+        emitter.on('database-catalog-group-list-filter-loaded', ({aList, sSelectedArticleID}) => {
             oThis.aGroupList = aList
-            oThis.sGroupSelectedID = iSelectedArticle
+            oThis.sGroupSelectedID = sSelectedArticleID
         })
 
-        emitter.on('database-catalog-category-list-filter-loaded', ({aList, iSelectedArticle}) => {
+        emitter.on('database-catalog-category-list-filter-loaded', ({aList, sSelectedArticleID}) => {
             oThis.aCategoryList = aList
-            oThis.sCategorySelectedID = iSelectedArticle
+            oThis.sCategorySelectedID = sSelectedArticleID
         })
 
-        emitter.on('database-catalog-article-list-filter-loaded', ({aList, iSelectedArticle}) => {
+        emitter.on('database-catalog-article-list-filter-loaded', ({aList, sSelectedArticleID}) => {
             oThis.aArticleList = aList
-            oThis.sArticleSelectedID = iSelectedArticle
+            oThis.sArticleSelectedID = sSelectedArticleID
         })
-
-        // emitter.on('database-group-list-loaded', ({aList, iSelectedArticle}) => {
-        //     oThis.aGroupList = aList
-        //     oThis.sGroupSelectedID = iSelectedArticle
-        //     _l('>>>database-group-list-loaded', {aList})
-        // })
-
-        // emitter.on('database-category-list-loaded', ({aList, iSelectedArticle}) => {
-        //     oThis.aCategoryList = aList
-        //     oThis.sCategorySelectedID = iSelectedArticle
-        //     _l('>>>database-category-list-loaded', {aList})
-        // })
-
-        // emitter.on('database-article-list-loaded', ({aList, iSelectedArticle}) => {
-        //     oThis.aArticleList = aList
-        //     oThis.sArticleSelectedID = iSelectedArticle
-        //     _l('>>>database-article-list-loaded', {aList})
-        // })
 
         // {"id":3, "name": "Test 3", "category_id": "1", "html": "asdfas fdasf"},
     }
