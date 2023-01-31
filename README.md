@@ -2,6 +2,8 @@
 
 Движок для введения блога с использованием github api и github pages.
 
+![](images/2023-01-31_16-42.png)
+
 ## Project setup
 ```
 npm install
@@ -19,3 +21,5 @@ npm run build
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+

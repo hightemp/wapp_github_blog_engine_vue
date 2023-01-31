@@ -184,6 +184,10 @@ body, html {
     grid-template-columns: 32px 1fr 3fr !important;
 }
 
+.item-image-row {
+    grid-template-columns: 1fr 3fr !important;
+}
+
 .item-tree-row {
     display: grid !important;
     grid-template-columns: 32px 32px 1fr;

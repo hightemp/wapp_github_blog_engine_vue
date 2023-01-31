@@ -652,15 +652,15 @@ export class Database {
 
     static fnArticleRemoveTags(iArticleID, aIDs)
     {
-        Database.oDatabase.tags_relations = Database.oDatabase.tags_relations.filter((oI) => !~aIDs.indexOf(oI.tag_id) && oI.article_id == iArticleID)
+        Database.oDatabase.tags_relations = Database.oDatabase.tags_relations.filter((oI) => ~aIDs.indexOf(oI.tag_id) && oI.article_id == iArticleID)
         _l('>>>', Database.oDatabase.tags_relations)
         emitter.emit('database-tag-list-tag-selector-remove-tags-success')
     }
 
     static fnArticleAddTags(iArticleID, aIDs)
     {
-        Database.oDatabase.tags_relations = Database.oDatabase.tags_relations.filter((oI) => !~aIDs.indexOf(oI.tag_id) && oI.article_id == iArticleID)
-        aIDs = aIDs.filter((sID) => !~Database.oDatabase.tags_relations.findIndex((oI) => oI.tag_id == sID))
+        // Database.oDatabase.tags_relations = Database.oDatabase.tags_relations.filter((oI) => !~aIDs.indexOf(oI.tag_id) && oI.article_id == iArticleID)
+        aIDs = aIDs.filter((sID) => !~Database.oDatabase.tags_relations.findIndex((oI) => oI.tag_id == sID && oI.article_id == iArticleID))
         Database.oDatabase.tags_relations = Database.oDatabase.tags_relations.concat(aIDs.map((sID) => {
             Database.oDatabase.tags_relations_last_id++;
             return {

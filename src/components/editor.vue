@@ -26,8 +26,21 @@
             <div class="actions-panel">
                 <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="" v-model="sImagesFilter" @input="fnImagesFilter">
             </div>
-            <div>
-                
+            <div class="list">
+                <template v-for="oI in aImagesList" :key="oI.id">
+                    <div :class="'input-group item-row item-image-row'">
+                        <a 
+                            :class="'list-group-item list-group-item-action item-title '" 
+                        >
+                            <div class="item-inner-title">
+                                <img src="">
+                            </div>
+                        </a>
+                        <div class="image-path">
+
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
         <div class="tab-page-comments" v-show="sCurrentTab=='comments'">
@@ -71,7 +84,9 @@ export default {
             oEditor: null,
             oClassicEditor: Editor,
 
-            oEditorConfig: {}
+            oEditorConfig: {},
+
+            aImagesList: [],
         }
     },
 
@@ -105,7 +120,7 @@ export default {
 
         },
         fnCommentsFilter() {
-            
+
         }
     },
 
