@@ -142,7 +142,7 @@ export class Database {
         if (iRepoIndex==-1) {
             Database.aReposList.push(oItem)
         } else {
-            Database.aReposList.splice(iRepoIndex, 1, [oItem])
+            Database.aReposList.splice(iRepoIndex, 1, oItem)
         }
         emitter.emit('database-repos-save')
     }
