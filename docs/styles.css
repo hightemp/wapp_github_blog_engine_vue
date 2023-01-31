@@ -272,6 +272,10 @@ a {
     width: 100px;
 }
 
+.modal-body {
+    text-align: left;
+}
+
 .list-repo-item {
     display: grid;
     grid-template-columns: 1fr 100px;
