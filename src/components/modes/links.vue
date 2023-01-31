@@ -7,7 +7,7 @@
         </div>
         <div class="list">
             <template v-for="(oI, iI) in aList" :key="oI.id">
-                <div :class="'input-group item-row '+(oI.id == sSelectedID ? 'active' : '')" @click="fnSelect(oI.id)">
+                <div :class="'input-group item-row item-links-row '+(oI.id == sSelectedID ? 'active' : '')" @click="fnSelect(oI.id)">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
                     </div>
@@ -15,6 +15,12 @@
                         :class="'list-group-item list-group-item-action item-title '" 
                     >
                         <div class="item-inner-title">{{oI.name}}</div>
+                    </a>
+                    <a 
+                        :href="oI.url"
+                        class="list-group-item list-group-item-action item-title link"
+                    >
+                        <div class="item-inner-title">{{oI.url}}</div>
                     </a>
                 </div>
             </template>
@@ -76,9 +82,9 @@ export default {
             emitter.emit('database-link-list-filter', '')
         })
 
-        emitter.on('database-link-list-filter-loaded', ({aList, sSelectedArticleID}) => {
+        emitter.on('database-link-list-filter-loaded', ({aList, sSelectedID}) => {
             oThis.aList = aList
-            oThis.sSelectedID = sSelectedArticleID
+            oThis.sSelectedID = sSelectedID
         })
     }
 }

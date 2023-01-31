@@ -120,8 +120,6 @@ body, html {
 }
 
 .page-actions-panel {
-    display: grid;
-    grid-template-columns: auto auto 1fr;
 }
 
 .current-mode {
@@ -180,6 +178,10 @@ body, html {
 
 .item-row>* {
     border-bottom: none !important;
+}
+
+.item-links-row {
+    grid-template-columns: 32px 1fr 3fr !important;
 }
 
 .item-tree-row {
@@ -306,3 +308,42 @@ a {
 .toast-body {
     text-align: left;
 }
+
+.selecteion-tag-panel {
+    display: grid;
+    grid-template-columns: 1fr 30px 1fr;
+    height: 400px
+}
+
+.selecteion-tag-panel select {
+    width: 100%;
+    height: 100%;
+}
+
+.selecteion-tag-panel .selector {
+    height: calc(100% - 30px);
+}
+
+.left-tag-panel {
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.middle-tag-panel {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.right-tag-panel {
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.link {
+    text-decoration: underline;
+    color: blue;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+

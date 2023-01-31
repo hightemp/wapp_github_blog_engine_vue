@@ -291,6 +291,7 @@ export class Database {
 
         emitter.on('database-tag-list', Database.fnGetTagList)
         emitter.on('database-tag-list-filter', Database.fnFilterTagList)
+        emitter.on('database-tag-list-tag-selector-filter', Database.fnFilterTagSelectorList)
         emitter.on('database-tag-update', Database.fnUpdateTag)
         emitter.on('database-tag-remove', Database.fnRemoveTag)
         emitter.on('database-tag-add', Database.fnCreateTag)
@@ -457,7 +458,7 @@ export class Database {
         _l('fnGetArticlesList')
         emitter.emit('database-article-list-loaded', { 
             aList: Database.oDatabase.articles, 
-            sSelectedArticleID: Database.sSelectedArticleID 
+            sSelectedID: Database.sSelectedArticleID 
         })
     }
 
@@ -465,7 +466,7 @@ export class Database {
     {
         emitter.emit('database-article-list-filter-loaded', { 
             aList: Database.fnFilterArticles(sFilter), 
-            sSelectedArticleID: Database.sSelectedArticleID 
+            sSelectedID: Database.sSelectedArticleID 
         })
     }
 
@@ -473,7 +474,7 @@ export class Database {
     {
         emitter.emit('database-catalog-article-list-filter-loaded', { 
             aList: Database.fnFilterCurrentArticles(sFilter), 
-            sSelectedArticleID: Database.sSelectedArticleID 
+            sSelectedID: Database.sSelectedArticleID 
         })
     }
 
@@ -481,7 +482,7 @@ export class Database {
     {
         emitter.emit('database-tag-article-list-filter-loaded', { 
             aList: Database.fnFilterCurrentTagsArticles(sFilter), 
-            sSelectedArticleID: Database.sSelectedArticleID 
+            sSelectedID: Database.sSelectedArticleID 
         })
     }
 
@@ -520,7 +521,7 @@ export class Database {
         _l('fnGetArticlesList')
         emitter.emit('database-catalog-group-list-loaded', { 
             aList: Database.oDatabase.groups, 
-            sSelectedArticleID: Database.sSelectedArticleID 
+            sSelectedID: Database.sSelectedArticleID 
         })
     }
 
@@ -528,7 +529,7 @@ export class Database {
     {
         emitter.emit('database-catalog-group-list-filter-loaded', { 
             aList: Database.fnFilterGroups(sFilter), 
-            sSelectedArticleID: Database.sSelectedArticleID 
+            sSelectedID: Database.sSelectedArticleID 
         })
     }
 
@@ -560,7 +561,7 @@ export class Database {
         _l('fnGetArticlesList')
         emitter.emit('database-catalog-category-list-loaded', { 
             aList: Database.oDatabase.groups, 
-            sSelectedArticleID: Database.sSelectedArticleID 
+            sSelectedID: Database.sSelectedArticleID 
         })
     }
 
@@ -568,7 +569,7 @@ export class Database {
     {
         emitter.emit('database-catalog-category-list-filter-loaded', { 
             aList: Database.fnFilterCurrentCategories(sFilter), 
-            sSelectedArticleID: Database.sSelectedArticleID 
+            sSelectedID: Database.sSelectedArticleID 
         })
     }
 
@@ -600,7 +601,7 @@ export class Database {
         _l('fnGetArticlesList')
         emitter.emit('database-tag-list-loaded', { 
             aList: Database.oDatabase.tags, 
-            sSelectedArticleID: Database.sSelectedTag 
+            sSelectedID: Database.sSelectedTag 
         })
     }
 
@@ -608,7 +609,15 @@ export class Database {
     {
         emitter.emit('database-tag-list-filter-loaded', { 
             aList: Database.fnFilterTags(sFilter), 
-            sSelectedArticleID: Database.sSelectedTag 
+            sSelectedID: Database.sSelectedTag 
+        })
+    }
+
+    static fnFilterTagSelectorList(sFilter)
+    {
+        emitter.emit('database-tag-list-tag-selector-filter-loaded', { 
+            aList: Database.fnFilterTags(sFilter), 
+            sSelectedID: Database.sSelectedTag 
         })
     }
 
@@ -639,7 +648,7 @@ export class Database {
     {
         emitter.emit('database-favorites-article-list-filter-loaded', { 
             aList: Database.fnFilterFavorites(sFilter), 
-            sSelectedArticleID: Database.sSelectedArticleID 
+            sSelectedID: Database.sSelectedArticleID 
         })
     }
 
@@ -671,7 +680,7 @@ export class Database {
         _l('fnGetArticlesList')
         emitter.emit('database-link-list-loaded', { 
             aList: Database.oDatabase.links, 
-            sSelectedArticleID: Database.iSelectedLink 
+            sSelectedID: Database.iSelectedLink 
         })
     }
 
@@ -679,7 +688,7 @@ export class Database {
     {
         emitter.emit('database-link-list-filter-loaded', { 
             aList: Database.fnFilterLinks(sFilter), 
-            sSelectedArticleID: Database.iSelectedLink 
+            sSelectedID: Database.iSelectedLink 
         })
     }
 

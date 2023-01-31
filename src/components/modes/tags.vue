@@ -121,15 +121,15 @@ export default {
             emitter.emit('database-tag-list-filter', '')
         })
 
-        emitter.on('database-tag-article-list-filter-loaded', ({aList, sSelectedArticleID}) => {
+        emitter.on('database-tag-article-list-filter-loaded', ({aList, sSelectedID}) => {
             oThis.aArticlesList = aList
-            oThis.sArticleSelectedID = sSelectedArticleID
+            oThis.sArticleSelectedID = sSelectedID
         })
 
-        emitter.on('database-tag-list-filter-loaded', ({aList, sSelectedArticleID}) => {
-            _l('database-tag-list-filter-loaded', {aList, sSelectedArticleID})
+        emitter.on('database-tag-list-filter-loaded', ({aList, sSelectedID}) => {
+            _l('database-tag-list-filter-loaded', {aList, sSelectedID})
             oThis.aTagsList = aList
-            oThis.sTagSelectedID = sSelectedArticleID
+            oThis.sTagSelectedID = sSelectedID
         })
         // emitter.on('database-article-list-loaded', ({aList, iSelectedArticle}) => {
         //     oThis.aList = aList

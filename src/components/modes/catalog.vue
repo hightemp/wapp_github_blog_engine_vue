@@ -177,19 +177,19 @@ export default {
             emitter.emit('database-catalog-article-list-filter', '')
         })
 
-        emitter.on('database-catalog-group-list-filter-loaded', ({aList, sSelectedArticleID}) => {
+        emitter.on('database-catalog-group-list-filter-loaded', ({aList, sSelectedID}) => {
             oThis.aGroupList = aList
-            oThis.sGroupSelectedID = sSelectedArticleID
+            oThis.sGroupSelectedID = sSelectedID
         })
 
-        emitter.on('database-catalog-category-list-filter-loaded', ({aList, sSelectedArticleID}) => {
+        emitter.on('database-catalog-category-list-filter-loaded', ({aList, sSelectedID}) => {
             oThis.aCategoryList = aList
-            oThis.sCategorySelectedID = sSelectedArticleID
+            oThis.sCategorySelectedID = sSelectedID
         })
 
-        emitter.on('database-catalog-article-list-filter-loaded', ({aList, sSelectedArticleID}) => {
+        emitter.on('database-catalog-article-list-filter-loaded', ({aList, sSelectedID}) => {
             oThis.aArticleList = aList
-            oThis.sArticleSelectedID = sSelectedArticleID
+            oThis.sArticleSelectedID = sSelectedID
         })
 
         // {"id":3, "name": "Test 3", "category_id": "1", "html": "asdfas fdasf"},
