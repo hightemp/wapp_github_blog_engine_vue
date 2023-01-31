@@ -28,6 +28,10 @@
 
     <AskAPIWindow v-show="bShowRepoWindow"/>
 
+    <EditGroup/>
+    <EditCategory/>
+    <EditArticle/>
+
     <SavedToast/>
 </template>
 
@@ -40,6 +44,10 @@ import LinksMode from "./components/modes/links.vue"
 
 import ErrorWindow from "./components/windows/error.vue"
 import AskAPIWindow from "./components/windows/ask_api.vue"
+
+import EditGroup from "./components/windows/edit_group.vue"
+import EditCategory from "./components/windows/edit_category.vue"
+import EditArticle from "./components/windows/edit_article.vue"
 
 import PageEditor from "./components/editor.vue"
 import SavedToast from "./components/toasts/saved.vue"
@@ -61,7 +69,10 @@ export default {
     ErrorWindow,
     AskAPIWindow,
     PageEditor,
-    SavedToast
+    SavedToast,
+    EditGroup,
+    EditCategory,
+    EditArticle,
   },
 
   data() {

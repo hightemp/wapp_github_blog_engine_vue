@@ -3,7 +3,7 @@
     <div class="all-articles-panel">
         <div class="actions-panel">
             <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="" v-model="sFilter" @input="fnFilter">
-            <Dropdown :items="aDropdownMenu" />
+            <Dropdown :items="aDropdownMenu" @clickitem="fnMenuItemClick" />
         </div>
         <div class="list">
             <template v-for="oI in aList" :key="oI.id">
@@ -63,6 +63,26 @@ export default {
         fnSelectArticle(sID)
         {
             emitter.emit('database-article-select', sID)
+        },
+        fnAddToFavorites()
+        {
+            emitter.emit('database-favorites-add', [oThis.sSelectedID])
+        },
+        fnMenuItemClick(oI)
+        {
+            if (oI.id == "reload") {
+                this.fnFilter()
+            }
+            if (oI.id == "add") {
+                alert('123')
+            }
+            if (oI.id == "edit") {
+            }
+            if (oI.id == "delete") {
+            }
+            if (oI.id == "favorites") {
+                this.fnAddToFavorites()
+            }
         }
     },
 

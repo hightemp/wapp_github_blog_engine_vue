@@ -517,7 +517,10 @@ export class Database {
     static fnSelectGroup(sID)
     {
         Database.iSelectedGroup = sID
-        emitter.emit('database-catalog-group-selected', Database.iSelectedGroup)
+        emitter.emit('database-catalog-group-selected', 
+            Database.iSelectedGroup,
+            Database.fnGetCurrentGroup()
+        )
     }
 
     static fnGetGroupList()
@@ -537,19 +540,30 @@ export class Database {
         })
     }
 
-    static fnUpdateGroup(iIndex, oItem)
+    static fnUpdateGroup(oItem)
     {
-        
+        var oNewItem = {...oItem}
+        var iI = Database.oDatabase.groups.findIndex((oI) => oNewItem.id == oI.id)
+        Database.oDatabase.groups.splice(iI, 1, oNewItem)
+        _l('>>>', [Database.oDatabase.groups, oNewItem])
+        emitter.emit('database-catalog-group-saved')
     }
 
-    static fnRemoveGroup(iIndex)
+    static fnRemoveGroup(sID)
     {
-        
+        var iI = Database.oDatabase.groups.findIndex((oI) => sID == oI.id)
+        Database.oDatabase.groups.splice(iI, 1)
+        emitter.emit('database-catalog-group-removed')
     }
 
-    static fnCreateGroup()
+    static fnCreateGroup(oItem)
     {
-        
+        Database.oDatabase.groups_last_id++
+        Database.oDatabase.groups.push({
+            id: Database.oDatabase.groups_last_id,
+            ...oItem
+        })
+        emitter.emit('database-catalog-group-saved')
     }
 
     // ===============================================================
@@ -557,7 +571,10 @@ export class Database {
     static fnSelectCategory(sID)
     {
         Database.iSelectedCategory = sID
-        emitter.emit('database-catalog-category-selected', Database.iSelectedCategory)
+        emitter.emit('database-catalog-category-selected', 
+            Database.iSelectedCategory,
+            Database.fnGetCurrentCategory()
+        )
     }
 
     static fnGetCategoryList()
@@ -597,7 +614,9 @@ export class Database {
     static fnSelectTag(sID)
     {
         Database.iSelectedTag = sID
-        emitter.emit('database-tag-selected', Database.iSelectedTag)
+        emitter.emit('database-tag-selected', 
+            Database.iSelectedTag
+        )
     }
 
     static fnGetTagList()
@@ -838,9 +857,14 @@ export class Database {
         return Database.oDatabase.articles.filter((oI) => ~oI.name.indexOf(sFilter))
     }
 
+    static fnGetCurrentGroup()
+    {
+        return Database.oDatabase.groups.find((oI) => oI.id==Database.iSelectedGroup)
+    }
+
     static fnGetCurrentCategory()
     {
-        return Database.oDatabase.categories.find((oI) => oI.id==Database.iCategoryID)
+        return Database.oDatabase.categories.find((oI) => oI.id==Database.iSelectedCategory)
     }
 
     static fnGetCurrentArticle()

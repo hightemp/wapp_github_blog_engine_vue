@@ -3,7 +3,7 @@
     <div class="groups-panel">
         <div class="actions-panel">
             <input type="text" class="form-control" @input="fnFilterGroup" v-model="sGroupGilter">
-            <Dropdown :items="aGroupDropdownMenu" />
+            <Dropdown :items="aGroupDropdownMenu" @clickitem="fnGroupClickItem" />
         </div>
         <div class="list">
             <template v-for="(oI, iI) in aGroupList" :key="oI.id">
@@ -23,7 +23,7 @@
     <div class="categories-panel">
         <div class="actions-panel">
             <input type="text" class="form-control" @input="fnFilterCategory" v-model="sCategoryFilter">
-            <Dropdown :items="aCategoryDropdownMenu" />
+            <Dropdown :items="aCategoryDropdownMenu" @clickitem="fnCategoryClickItem"/>
         </div>
         <div class="list">
             <TreeList 
@@ -50,7 +50,7 @@
     <div class="articles-panel">
         <div class="actions-panel">
             <input type="text" class="form-control" @input="fnFilterArticle" v-model="sArticleFilter">
-            <Dropdown :items="aArticleDropdownMenu" />
+            <Dropdown :items="aArticleDropdownMenu" @clickitem="fnArticleClickItem"/>
         </div>
         <div class="list">
             <template v-for="(oI, iI) in aArticleList" v-key="oI.id">
@@ -95,6 +95,10 @@ export default {
             sGroupSelectedID: null,
             sCategorySelectedID: null,
             sArticleSelectedID: null,
+
+            oSelectedGroup: null,
+            oSelectedCategory: null,
+            oSelectedArticle: null,
 
             sGroupGilter: "",
             sCategoryFilter: "",
@@ -150,24 +154,89 @@ export default {
         {
             emitter.emit('database-article-select', sID)
         },
+
+        fnGroupClickItem(oI) {
+            var oThis = this
+
+            if (oI.id == "reload") {
+                this.fnFilterGroup()
+            }
+            if (oI.id == "add") {
+                emitter.emit('group-window-show', null)
+            }
+            if (oI.id == "edit") {
+                if (!oThis.oSelectedGroup) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('group-window-show', oThis.oSelectedGroup)
+                }
+            }
+            if (oI.id == "delete") {
+                if (!oThis.oSelectedGroup) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('database-catalog-group-remove', oThis.oSelectedGroup.id)
+                }
+            }
+        },
+        fnCategoryClickItem(oI) {
+            var oThis = this
+
+            if (oI.id == "reload") {
+                this.fnFilterCategory()
+            }
+            if (oI.id == "add") {
+            }
+            if (oI.id == "edit") {
+                if (!oThis.oSelectedCategory) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('category-window-show', oThis.oSelectedCategory)
+                }
+            }
+            if (oI.id == "delete") {
+            }
+        },
+        fnArticleClickItem(oI) {
+            var oThis = this
+
+            if (oI.id == "reload") {
+                this.fnFilterArticle()
+            }
+            if (oI.id == "add") {
+            }
+            if (oI.id == "edit") {
+                if (!oThis.oSelectedArticle) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('article-window-show', oThis.oSelectedArticle)
+                }
+            }
+            if (oI.id == "delete") {
+            }
+        },
     },
 
     created() {
         var oThis = this
         _l('created')
 
-        emitter.on('database-catalog-group-selected', (sID) => {
+        emitter.on('database-catalog-group-selected', (sID, oI) => {
             oThis.sGroupSelectedID = sID
+            oThis.oSelectedGroup = oI
+            _l('???', [oThis.sGroupSelectedID, oThis.oSelectedGroup])
             emitter.emit('database-catalog-category-list-filter', oThis.sCategoryFilter)
         })
 
-        emitter.on('database-catalog-category-selected', (sID) => {
+        emitter.on('database-catalog-category-selected', (sID, oI) => {
             oThis.sCategorySelectedID = sID
+            oThis.oSelectedCategory = oI
             emitter.emit('database-catalog-article-list-filter', oThis.sArticleFilter)
         })
 
-        emitter.on('database-catalog-article-selected', (sID) => {
+        emitter.on('database-catalog-article-selected', (sID, oI) => {
             oThis.sArticleSelectedID = sID
+            oThis.oSelectedArticle = oI
         })
 
         emitter.on('database-repos-selected', () => {
@@ -190,6 +259,47 @@ export default {
         emitter.on('database-catalog-article-list-filter-loaded', ({aList, sSelectedID}) => {
             oThis.aArticleList = aList
             oThis.sArticleSelectedID = sSelectedID
+        })
+
+
+        emitter.on('database-catalog-group-removed', () => {
+            oThis.sGroupSelectedID = null
+            oThis.sCategorySelectedID = null
+            oThis.sArticleSelectedID = null
+            emitter.emit('database-catalog-group-select', null)
+            emitter.emit('database-catalog-category-select', null)
+            emitter.emit('database-article-select', null)
+            oThis.fnFilterGroup()
+            oThis.fnFilterCategory()
+            oThis.fnFilterArticle()
+        })
+
+        emitter.on('database-catalog-category-removed', () => {
+            oThis.sCategorySelectedID = null
+            oThis.sArticleSelectedID = null
+            emitter.emit('database-catalog-category-select', null)
+            emitter.emit('database-article-select', null)
+            oThis.fnFilterCategory()
+            oThis.fnFilterArticle()
+        })
+
+        emitter.on('database-catalog-article-removed', () => {
+            oThis.sArticleSelectedID = null
+            emitter.emit('database-article-select', null)
+            oThis.fnFilterArticle()
+        })
+
+
+        emitter.on('database-catalog-group-list-filter-reload', () => {
+            oThis.fnFilterGroup()
+        })
+
+        emitter.on('database-catalog-category-list-filter-reload', () => {
+            oThis.fnFilterCategory()
+        })
+
+        emitter.on('database-catalog-article-list-filter-reload', () => {
+            oThis.fnFilterArticle()
         })
 
         // {"id":3, "name": "Test 3", "category_id": "1", "html": "asdfas fdasf"},
