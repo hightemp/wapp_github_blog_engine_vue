@@ -20,7 +20,7 @@
             ></ckeditor>
         </div>
         <div class="tab-page-tags" v-show="sCurrentTab=='tags'">
-            <TagsSelector />
+            <TagsSelector :id="sArticleID"/>
         </div>
         <div class="tab-page-images" v-show="sCurrentTab=='images'">
             <div class="actions-panel">
@@ -61,7 +61,11 @@ export default {
 
             bShowEditor: false,
 
+            sImagesFilter: "",
+            sCommentsFilter: "",
+
             sData: "",
+            sArticleID: null,
             oArticle: null,
 
             oEditor: null,
@@ -96,6 +100,12 @@ export default {
         },
         fnOpenLink() {
             emitter.emit('database-article-open-url')
+        },
+        fnImagesFilter() {
+
+        },
+        fnCommentsFilter() {
+            
         }
     },
 
@@ -141,11 +151,13 @@ export default {
         emitter.on('database-catalog-article-selected', (sID, oArticle) => {
             _l('database-catalog-article-selected', {sID, oArticle})
             if (sID == null) {
-                oThis.bShowEditor = false;
-                oThis.oArticle = null;
+                oThis.bShowEditor = false
+                oThis.oArticle = null
+                oThis.sArticleID = sID
             } else {
-                oThis.bShowEditor = true;
+                oThis.bShowEditor = true
                 oThis.oArticle = oArticle
+                oThis.sArticleID = sID
                 if (oThis.oEditor) {
                     oThis.oEditor.setData(oArticle.html)
                 }

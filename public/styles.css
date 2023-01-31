@@ -320,6 +320,10 @@ a {
     height: 100%;
 }
 
+.selecteion-tag-panel select option {
+    font-size: 16px;
+}
+
 .selecteion-tag-panel .selector {
     height: calc(100% - 30px);
 }
@@ -333,7 +337,7 @@ a {
     border-bottom: 1px solid rgba(0,0,0,0.1);
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-content: center;
 }
 
 .right-tag-panel {
@@ -341,8 +345,8 @@ a {
 }
 
 .link {
-    text-decoration: underline;
-    color: blue;
+    text-decoration: underline !important;
+    color: blue !important;
     overflow-x: hidden;
     text-overflow: ellipsis;
 }

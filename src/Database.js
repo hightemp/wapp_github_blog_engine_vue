@@ -28,7 +28,7 @@ export class Database {
         "favorites": [],
         "tags_last_id": 0,
         "tags": [],
-        "tags_relataions_last_id": 0,
+        "tags_relations_last_id": 0,
         "tags_relations": [],
         "links_last_id": 0,
         "links": [],
@@ -68,9 +68,10 @@ export class Database {
             {"id":3, "name":"development"},
             {"id":4, "name":"lorem"},
         ],
-        "tags_relataions_last_id": 1,
+        "tags_relations_last_id": 2,
         "tags_relations": [
             {"id":1, "tag_id":1, "article_id":1},
+            {"id":2, "tag_id":4, "article_id":1},
         ],
         "links_last_id": 4,
         "links": [
@@ -292,10 +293,13 @@ export class Database {
         emitter.on('database-tag-list', Database.fnGetTagList)
         emitter.on('database-tag-list-filter', Database.fnFilterTagList)
         emitter.on('database-tag-list-tag-selector-filter', Database.fnFilterTagSelectorList)
+        emitter.on('database-tag-list-tag-selector-article-filter', Database.fnFilterTagSelectorForArticleList)
         emitter.on('database-tag-update', Database.fnUpdateTag)
         emitter.on('database-tag-remove', Database.fnRemoveTag)
         emitter.on('database-tag-add', Database.fnCreateTag)
         emitter.on('database-tag-select', Database.fnSelectTag)
+        emitter.on('database-tag-list-tag-selector-remove-tags', Database.fnArticleRemoveTags)
+        emitter.on('database-tag-list-tag-selector-add-tags', Database.fnArticleAddTags)
 
         emitter.on('database-favorites-update', Database.fnUpdateFavorites)
         emitter.on('database-favorites-remove', Database.fnRemoveFavorites)
@@ -621,6 +625,16 @@ export class Database {
         })
     }
 
+
+    static fnFilterTagSelectorForArticleList(iArticleID, sFilter)
+    {
+        _l('fnFilterTagSelectorForArticleList', iArticleID, sFilter, Database.fnFilterArticlesTags(iArticleID, sFilter))
+        emitter.emit('database-tag-list-tag-selector-article-filter-loaded', { 
+            aList: Database.fnFilterArticlesTags(iArticleID, sFilter), 
+            sSelectedID: Database.sSelectedTag 
+        })
+    }
+
     static fnUpdateTag(iIndex, oItem)
     {
         
@@ -634,6 +648,29 @@ export class Database {
     static fnCreateTag()
     {
         
+    }
+
+    static fnArticleRemoveTags(iArticleID, aIDs)
+    {
+        Database.oDatabase.tags_relations = Database.oDatabase.tags_relations.filter((oI) => !~aIDs.indexOf(oI.tag_id) && oI.article_id == iArticleID)
+        _l('>>>', Database.oDatabase.tags_relations)
+        emitter.emit('database-tag-list-tag-selector-remove-tags-success')
+    }
+
+    static fnArticleAddTags(iArticleID, aIDs)
+    {
+        Database.oDatabase.tags_relations = Database.oDatabase.tags_relations.filter((oI) => !~aIDs.indexOf(oI.tag_id) && oI.article_id == iArticleID)
+        aIDs = aIDs.filter((sID) => !~Database.oDatabase.tags_relations.findIndex((oI) => oI.tag_id == sID))
+        Database.oDatabase.tags_relations = Database.oDatabase.tags_relations.concat(aIDs.map((sID) => {
+            Database.oDatabase.tags_relations_last_id++;
+            return {
+                id: Database.oDatabase.tags_relations_last_id,
+                tag_id: sID,
+                article_id: iArticleID
+            }
+        }))
+        _l('>>>', Database.oDatabase.tags_relations)
+        emitter.emit('database-tag-list-tag-selector-add-tags-success')
     }
 
     // ===============================================================
@@ -754,6 +791,16 @@ export class Database {
     static fnFilterLinks(sFilter)
     {
         return Database.oDatabase.links.filter((oI) => ~oI.name.indexOf(sFilter))
+    }
+
+    static fnGetArticlesTags(oArticleID)
+    {
+        return Database.oDatabase.tags.filter((oI) => ~Database.oDatabase.tags_relations.findIndex((oFI) => oArticleID == oFI.article_id && oFI.tag_id == oI.id))
+    }
+
+    static fnFilterArticlesTags(oArticleID, sFilter)
+    {
+        return Database.fnGetArticlesTags(oArticleID).filter((oI) => ~oI.name.indexOf(sFilter))
     }
 
     static fnGetTagsArticles(sTagID)
