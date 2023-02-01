@@ -26,7 +26,7 @@
             <Dropdown :items="aArticleDropdownMenu" />
         </div>
         <div class="list">
-            <template v-for="(oI, iI) in aArticlesList" :key="oI.id">
+            <template v-for="oI in aArticlesList" :key="oI.id">
                 <div :class="'input-group item-row '+(oI.id == sArticleSelectedID ? 'active' : '')" @click="fnSelectArticle(oI.id)">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
@@ -116,7 +116,7 @@ export default {
             emitter.emit('database-tag-article-list-filter', oThis.sArticleFilter)
         })
 
-        emitter.on('database-repos-selected', () => {
+        emitter.on('database-repos-load', () => {
             emitter.emit('database-tag-article-list-filter', '')
             emitter.emit('database-tag-list-filter', '')
         })

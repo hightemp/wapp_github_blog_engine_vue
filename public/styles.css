@@ -44,7 +44,7 @@ body, html {
     grid-area: a;
     border-bottom: 1px solid rgba(0,0,0,0.1);
     display: grid;
-    grid-template-columns: 1fr 20px;
+    grid-template-columns: 1fr 43px;
 }
 
 .top-right-panel > * {
@@ -54,6 +54,7 @@ body, html {
     width: 20px;
     height: 20px;
     background: rgba(0,0,0,0.2);
+    margin-right: 1px;
 }
 
 .wrapper > * {

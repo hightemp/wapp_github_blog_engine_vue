@@ -5,7 +5,22 @@ import { encode, decode } from 'js-base64'
 import { emitter } from './EventBus'
 
 export class FileSystemDriver {
-    static oDatabase = {}
+    static oDatabase = {
+        "groups_last_id": 0,
+        "groups": [],
+        "categories_last_id": 0,
+        "categories": [],
+        "articles_last_id": 0,
+        "articles": [],
+        "favorites_last_id": 0,
+        "favorites": [],
+        "tags_last_id": 0,
+        "tags": [],
+        "tags_relations_last_id": 0,
+        "tags_relations": [],
+        "links_last_id": 0,
+        "links": [],
+    }
 
     /** @var Octokit octokit */
     static octokit = null
@@ -125,18 +140,22 @@ export class FileSystemDriver {
 
         return new Promise(async (fnResolv, fnReject) => {
             try {
-                var sData = await FileSystemDriver.webdav.getFileContents(FileSystemDriver.DATABASE_PATH)
-                FileSystemDriver.oDatabase = JSON.parse(decode(sData))
+                var oData = (await FileSystemDriver.webdav.getFileContents(FileSystemDriver.DATABASE_PATH))
+                var enc = new TextDecoder("utf-8");
+                var sData = enc.decode(oData)
+                _l('fnReadDatabaseWebdav', sData)
+                FileSystemDriver.oDatabase = JSON.parse(sData)
+                fnResolv(FileSystemDriver.oDatabase)
             } catch (oE) {
                 _l(oE)
-                emitter.emit('database-db-load-error', oE+'')
+                emitter.emit('database-db-error', oE+'')
     
                 if (/Not Found/.test(oE+'')) {
                     emitter.emit('database-db-load-error-notfound', oE+'')
     
                     emitter.emit('database-db-save')
                 } else {
-                    emitter.emit('database-db-load-error-github-exception', aAnsw)
+                    emitter.emit('database-db-load-error-github-exception', oE+'')
                 }
             }
         })
@@ -156,14 +175,14 @@ export class FileSystemDriver {
             emitter.emit('database-db-loaded')
             return FileSystemDriver.oDatabase
         }).catch((...aAnsw) => {
-            emitter.emit('database-db-load-error', aAnsw)
+            emitter.emit('database-db-error', aArgs[0]+'')
 
             if (/Not Found/.test(aAnsw[0])) {
-                emitter.emit('database-db-load-error-notfound', aAnsw)
+                emitter.emit('database-db-load-error-notfound', aArgs[0]+'')
 
                 emitter.emit('database-db-save')
             } else {
-                emitter.emit('database-db-load-error-github-exception', aAnsw)
+                emitter.emit('database-db-load-error-github-exception', aArgs[0]+'')
             }
         })
     }
@@ -185,7 +204,8 @@ export class FileSystemDriver {
             emitter.emit('database-db-saved')
         })
         .catch((...aArgs) => {
-            emitter.emit('database-db-save-error', aArgs)
+            emitter.emit('database-db-error', aArgs[0]+'')
+            emitter.emit('database-db-save-error', aArgs[0]+'')
         })
     }
 
@@ -195,16 +215,27 @@ export class FileSystemDriver {
         var oR = FileSystemDriver.oRepoItem
 
         return new Promise(async (fnResolv, fnReject) => {
-            await FileSystemDriver.webdav.putFileContents(FileSystemDriver.DATABASE_PATH, sData)
-        }).catch((...aAnsw) => {
-            emitter.emit('database-db-load-error', aAnsw)
-
-            if (/Not Found/.test(aAnsw[0])) {
-                emitter.emit('database-db-load-error-notfound', aAnsw)
-
-                emitter.emit('database-db-save')
-            } else {
-                emitter.emit('database-db-load-error-github-exception', aAnsw)
+            try {
+                var enc = new TextEncoder()
+                var aData = enc.encode(sData)
+                await FileSystemDriver.webdav.putFileContents(
+                    FileSystemDriver.DATABASE_PATH, 
+                    aData,
+                    { contentLength: false, overwrite: true }
+                )
+                emitter.emit('database-db-saved')
+            } catch (oE) {
+                emitter.emit('database-db-error', oE+'')
+                emitter.emit('database-db-save-error', oE+'')
+    
+                if (/Not Found/.test(oE+'')) {
+                    emitter.emit('database-db-load-error-notfound', oE+'')
+    
+                    emitter.emit('database-db-save')
+                } else {
+                    emitter.emit('database-db-load-error-github-exception', oE+'')
+                }
+                throw oE
             }
         })
     }

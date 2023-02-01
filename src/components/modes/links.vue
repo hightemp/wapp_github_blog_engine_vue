@@ -78,7 +78,7 @@ export default {
             oThis.sSelectedID = sID
         })
 
-        emitter.on('database-repos-selected', () => {
+        emitter.on('database-repos-load', () => {
             emitter.emit('database-link-list-filter', '')
         })
 

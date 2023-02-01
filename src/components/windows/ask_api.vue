@@ -194,7 +194,7 @@ export default {
                 if (!aList[iSelectedRepoIndex]) {
                     alert('Не выбрано');
                 } else {
-                    emitter.emit('database-repos-select', iSelectedRepoIndex)
+                    emitter.emit('database-repos-select-accept')
                     emitter.emit('repo-window-close')
                 }
             })

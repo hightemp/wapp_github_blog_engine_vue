@@ -53,7 +53,7 @@
             <Dropdown :items="aArticleDropdownMenu" @clickitem="fnArticleClickItem"/>
         </div>
         <div class="list">
-            <template v-for="(oI, iI) in aArticleList" v-key="oI.id">
+            <template v-for="oI in aArticleList" :key="oI.id">
                 <div :class="'input-group item-row '+(oI.id == sArticleSelectedID ? 'active' : '')" @click="fnSelectArticle(oI.id)">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
@@ -271,8 +271,8 @@ export default {
             oThis.oSelectedArticle = oI
         })
 
-        emitter.on('database-repos-selected', () => {
-            _l('database-repos-selected')
+        emitter.on('database-repos-load', () => {
+            _l('database-repos-load')
             emitter.emit('database-catalog-group-list-filter', '')
             emitter.emit('database-catalog-category-list-filter', '')
             emitter.emit('database-catalog-article-list-filter', '')

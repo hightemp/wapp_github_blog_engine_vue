@@ -19,21 +19,8 @@ export class Database {
     static iSelectedTag = null
     static iSelectedLink = null
 
-    static oDatabase = {
-        "groups_last_id": 0,
-        "groups": [],
-        "categories_last_id": 0,
-        "categories": [],
-        "articles_last_id": 0,
-        "articles": [],
-        "favorites_last_id": 0,
-        "favorites": [],
-        "tags_last_id": 0,
-        "tags": [],
-        "tags_relations_last_id": 0,
-        "tags_relations": [],
-        "links_last_id": 0,
-        "links": [],
+    static get oDatabase() {
+        return FileSystemDriver.oDatabase
     }
 
     static oDefaultDatabase = {
@@ -233,7 +220,7 @@ export class Database {
         // emitter.on('database-load', FileSystemDriver.fnReadDatabase)
         // emitter.on('database-save', FileSystemDriver.fnWriteDatabase)
 
-        emitter.on('database-repos-selected', Database.fnReadDatabase)
+        emitter.on('database-repos-select-accept', Database.fnRepoSelected)
         emitter.on('database-db-load', Database.fnReadDatabase)
         emitter.on('database-db-save', Database.fnWriteDatabase)
 
@@ -288,23 +275,33 @@ export class Database {
         emitter.on('database-link-select', Database.fnSelectLink)
 
         emitter.on('database-article-open-url', Database.fnOpenArticleURL)
-
-        // emitter.emit('database-repos-load')
     }
 
     // ===============================================================
 
+    static fnRepoSelected()
+    {
+        Database
+            .fnReadDatabase()
+            .then(() => {
+                emitter.emit('database-repos-load')
+            })
+    }
+
     static fnReadDatabase()
     {
-        FileSystemDriver
+        _l('fnReadDatabase', [Database.oDatabase])
+        return FileSystemDriver
             .fnReadDatabase()
-            .then((oDatabase) => {
-                Database.oDatabase = oDatabase
-            })
+            // .then((oDatabase) => {
+            //     Database.oDatabase = oDatabase
+            //     _l('fnReadDatabase then', [Database.oDatabase])
+            // })
     }
 
     static fnWriteDatabase()
     {
+        _l('fnWriteDatabase', [Database.oDatabase])
         FileSystemDriver
             .fnWriteDatabase()
     }
@@ -388,11 +385,13 @@ export class Database {
         emitter.emit('database-article-removed')
     }
 
-    static fnCreateArticle()
+    static fnCreateArticle(oItem)
     {
         Database.oDatabase.articles_last_id++
         Database.oDatabase.articles.push({
             id: Database.oDatabase.articles_last_id,
+            category_id: null,
+            html: '',
             ...oItem
         })
         emitter.emit('database-article-saved')
@@ -403,6 +402,7 @@ export class Database {
         var oA = Database.fnGetCurrentArticle()
         oA.html = sContent
         emitter.emit('database-article-saved')
+        emitter.emit('database-db-save')
     }
 
     // ===============================================================

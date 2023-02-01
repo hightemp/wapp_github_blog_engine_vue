@@ -7,6 +7,7 @@
             </template>
           </div>
           <div class="top-right-panel">
+            <button class="" @click="fnSaveAll" title="Сохранить все"><i class="bi bi-cloud-arrow-up"></i></button>
             <button class="" @click="fnShowRepoWindow" title="Выбрать другую сессию"><i class="bi bi-person-fill"></i></button>
           </div>
         </div>
@@ -117,6 +118,9 @@ export default {
     },
     fnShowRepoWindow() {
       this.bShowRepoWindow = true
+    },
+    fnSaveAll() {
+      emitter.emit('database-db-save')
     }
   },
 
@@ -152,16 +156,16 @@ export default {
       oThis.sErrorWindowMessage = "База заметок не была найдена. И была создана новая."
     })
 
-    emitter.on('database-db-load-error-github-exception', (aAnsw) => {
+    emitter.on('database-db-load-error-github-exception', (sE) => {
       oThis.bShowErrorWindow = true
       oThis.sErrorWindowTitle = "Ошибка"
-      oThis.sErrorWindowMessage = aAnsw[0]
+      oThis.sErrorWindowMessage = sE
     })
 
-    emitter.on('database-db-save-error', (aAnsw) => {
+    emitter.on('database-db-save-error', (sE) => {
       oThis.bShowErrorWindow = true
       oThis.sErrorWindowTitle = "Ошибка"
-      oThis.sErrorWindowMessage = aAnsw[0]
+      oThis.sErrorWindowMessage = sE
     })
 
     emitter.on('database-repos-loaded', ({aList, iSelectedRepoIndex}) => {
@@ -175,7 +179,7 @@ export default {
       }
     })
 
-    document.addEventListener('keydown', e => {
+    document.addEventListener('keyup keydown', e => {
       if (e.ctrlKey && e.key === 's') {
           e.preventDefault();
           _l('CTRL + S');
