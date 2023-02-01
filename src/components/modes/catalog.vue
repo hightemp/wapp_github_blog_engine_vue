@@ -186,6 +186,7 @@ export default {
                 this.fnFilterCategory()
             }
             if (oI.id == "add") {
+                emitter.emit('category-window-show', null)
             }
             if (oI.id == "edit") {
                 if (!oThis.oSelectedCategory) {

@@ -278,6 +278,7 @@ export class Database {
 
         emitter.on('database-catalog-group-list', Database.fnGetGroupList)
         emitter.on('database-catalog-group-list-filter', Database.fnFilterGroupList)
+        emitter.on('database-catalog-category-group-list', Database.fnGetCategoryGroupList)
         emitter.on('database-catalog-group-update', Database.fnUpdateGroup)
         emitter.on('database-catalog-group-remove', Database.fnRemoveGroup)
         emitter.on('database-catalog-group-add', Database.fnCreateGroup)
@@ -285,6 +286,7 @@ export class Database {
 
         emitter.on('database-catalog-category-list', Database.fnGetCategoryList)
         emitter.on('database-catalog-category-list-filter', Database.fnFilterCategoryList)
+        emitter.on('database-catalog-category-for-group-list', Database.fnGetCategoryForGroupList)
         emitter.on('database-catalog-category-update', Database.fnUpdateCategory)
         emitter.on('database-catalog-category-remove', Database.fnRemoveCategory)
         emitter.on('database-catalog-category-add', Database.fnCreateCategory)
@@ -532,6 +534,14 @@ export class Database {
         })
     }
 
+    static fnGetCategoryGroupList()
+    {
+        emitter.emit('database-catalog-category-group-list-loaded', { 
+            aList: Database.oDatabase.groups, 
+            sSelectedID: Database.sSelectedArticleID 
+        })
+    }
+
     static fnFilterGroupList(sFilter)
     {
         emitter.emit('database-catalog-group-list-filter-loaded', { 
@@ -581,7 +591,14 @@ export class Database {
     {
         _l('fnGetArticlesList')
         emitter.emit('database-catalog-category-list-loaded', { 
-            aList: Database.oDatabase.groups, 
+            aList: Database.oDatabase.categories, 
+            sSelectedID: Database.sSelectedArticleID 
+        })
+    }
+
+    static fnGetCategoryForGroupList(sGroupID) {
+        emitter.emit('database-catalog-category-for-group-list-loaded', { 
+            aList: Database.fnFilterTreeCategoriesByGroup(sGroupID), 
             sSelectedID: Database.sSelectedArticleID 
         })
     }
@@ -845,6 +862,45 @@ export class Database {
     static fnFilterGroups(sFilter)
     {
         return Database.oDatabase.groups.filter((oI) => ~oI.name.indexOf(sFilter))
+    }
+
+    static fnFilterTreeCategoriesByGroup(sID)
+    {
+        var aChildren = Database.oDatabase.categories.filter((oI) => oI.group_id == sID && oI.parent_id*1 === 0)
+        var aCategories = JSON.parse(JSON.stringify(aChildren))
+        var aOutput = []
+        
+        for (var oCategory of aCategories) {
+            // oCategory.name = oCategory.parent_id + ' ' + oCategory.name
+            aOutput = aOutput.concat([oCategory])
+            aCategories = Database.fnFilterCategoriesByParent(oCategory.id)
+            aOutput = aOutput.concat(aCategories)
+        }
+
+        // _l('>>>>', [sID, aOutput])
+
+        return aOutput
+    }
+
+    static fnFilterCategoriesByGroup(sID)
+    {
+        return Database.oDatabase.categories.filter((oI) => oI.group_id == sID && oI.parent_id*1 === 0)
+    }
+
+    static fnFilterCategoriesByParent(sID, iLevel=1)
+    {
+        var aChildren = Database.oDatabase.categories.filter((oI) => oI.parent_id == sID)
+        var aCategories = JSON.parse(JSON.stringify(aChildren))
+        var aOutput = []
+        
+        for (var oCategory of aCategories) {
+            oCategory.name = '--'.repeat(iLevel) + (iLevel > 0 ? '--' : '') + oCategory.name
+            aOutput = aOutput.concat([oCategory])
+            aCategories = Database.fnFilterCategoriesByParent(oCategory.id, iLevel+1)
+            aOutput = aOutput.concat(aCategories)
+        }
+
+        return aOutput
     }
 
     static fnFilterCategories(sFilter)
