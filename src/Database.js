@@ -501,7 +501,7 @@ export class Database {
         emitter.emit('database-article-saved')
     }
 
-    static fnRemoveArticle(iIndex)
+    static fnRemoveArticle(sID)
     {
         var iI = Database.oDatabase.articles.findIndex((oI) => sID == oI.id)
         Database.oDatabase.articles.splice(iI, 1)
@@ -630,7 +630,7 @@ export class Database {
         emitter.emit('database-catalog-category-saved')
     }
 
-    static fnRemoveCategory(iIndex)
+    static fnRemoveCategory(sID)
     {
         var iI = Database.oDatabase.categories.findIndex((oI) => sID == oI.id)
         Database.oDatabase.categories.splice(iI, 1)

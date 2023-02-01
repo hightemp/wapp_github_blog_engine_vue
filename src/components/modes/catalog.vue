@@ -206,6 +206,11 @@ export default {
                 }
             }
             if (oI.id == "delete") {
+                if (!oThis.oSelectedCategory) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('database-catalog-category-remove', oThis.oSelectedCategory.id)
+                }
             }
         },
         fnArticleClickItem(oI) {
@@ -235,6 +240,11 @@ export default {
                 }
             }
             if (oI.id == "delete") {
+                if (!oThis.oSelectedArticle) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('database-article-remove', oThis.oSelectedArticle.id)
+                }
             }
         },
     },
@@ -305,7 +315,7 @@ export default {
             oThis.fnFilterArticle()
         })
 
-        emitter.on('database-catalog-article-removed', () => {
+        emitter.on('database-article-removed', () => {
             oThis.sArticleSelectedID = null
             emitter.emit('database-article-select', null)
             oThis.fnFilterArticle()
