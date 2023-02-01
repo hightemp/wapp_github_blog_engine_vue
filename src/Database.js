@@ -492,19 +492,30 @@ export class Database {
         })
     }
 
-    static fnUpdateArticle(iIndex, oItem)
+    static fnUpdateArticle(oItem)
     {
-        
+        var oNewItem = {...oItem}
+        var iI = Database.oDatabase.articles.findIndex((oI) => oNewItem.id == oI.id)
+        Database.oDatabase.articles.splice(iI, 1, oNewItem)
+        _l('>>> fnUpdateArticle', [Database.oDatabase.articles, oNewItem])
+        emitter.emit('database-article-saved')
     }
 
     static fnRemoveArticle(iIndex)
     {
-        
+        var iI = Database.oDatabase.articles.findIndex((oI) => sID == oI.id)
+        Database.oDatabase.articles.splice(iI, 1)
+        emitter.emit('database-article-removed')
     }
 
     static fnCreateArticle()
     {
-        
+        Database.oDatabase.articles_last_id++
+        Database.oDatabase.articles.push({
+            id: Database.oDatabase.articles_last_id,
+            ...oItem
+        })
+        emitter.emit('database-article-saved')
     }
 
     static fnSaveCurrentArticle(sContent)

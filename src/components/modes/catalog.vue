@@ -215,12 +215,23 @@ export default {
                 this.fnFilterArticle()
             }
             if (oI.id == "add") {
+                emitter.emit('article-window-show', 
+                    null,
+                    oThis.oSelectedCategory,
+                    oThis.oSelectedGroup,
+                    oThis.oSelectedArticle
+                )
             }
             if (oI.id == "edit") {
                 if (!oThis.oSelectedArticle) {
                     alert('Нужно выбрать');
                 } else {
-                    emitter.emit('article-window-show', oThis.oSelectedArticle)
+                    emitter.emit('article-window-show', 
+                        oThis.oSelectedArticle,
+                        oThis.oSelectedCategory,
+                        oThis.oSelectedGroup,
+                        oThis.oSelectedArticle
+                    )
                 }
             }
             if (oI.id == "delete") {
