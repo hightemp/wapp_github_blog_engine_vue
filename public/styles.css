@@ -284,10 +284,15 @@ a {
 
 .modal-ask-api_list_buttons {
     display: grid;
-    grid-template-columns: 1fr 100px 100px;
+    grid-template-columns: 1fr auto;
     gap: 5px;
     padding: 0px 0px 5px 0px;
     border-bottom: 1px solid #eee;
+}
+
+.modal-ask-api_list_buttons > div {
+    gap: 5px;
+    display: flex;
 }
 
 #modal-ask-api-key .form-label {
@@ -311,6 +316,22 @@ a {
 .list-repo-item.active {
     background: blue;
     color: white;
+}
+
+.list-repo-item_title {
+    display: flex;
+}
+
+.list-repo-item_type {
+    background: green;
+    color: white;
+    padding: 5px;
+}
+
+.list-repo-item_name {
+    background: grey;
+    color: white;
+    padding: 5px;
 }
 
 .toast-body {

@@ -34,7 +34,7 @@ export default {
 
     created() {
         var oThis = this
-        emitter.on('database-git-saved', () => {
+        emitter.on('database-db-saved', () => {
             oThis.bShowSaveToast = true
             setTimeout(() => {
                 oThis.bShowSaveToast = false

@@ -3,7 +3,7 @@
         <div class="top-panel">
           <div>
             <template v-if="oRepo"> 
-            {{oRepo.login}} | {{oRepo.repo}} | <a :href="sURL">{{sURL}}</a>
+            {{oRepo.name}}
             </template>
           </div>
           <div class="top-right-panel">
@@ -146,19 +146,19 @@ export default {
       oThis.bShowRepoWindow = false
     })
 
-    emitter.on('database-git-load-error-notfound', () => {
+    emitter.on('database-db-load-error-notfound', () => {
       oThis.bShowErrorWindow = true
       oThis.sErrorWindowTitle = "Важно"
-      oThis.sErrorWindowMessage = "База заметок не бфла найдена. И была создана новая."
+      oThis.sErrorWindowMessage = "База заметок не была найдена. И была создана новая."
     })
 
-    emitter.on('database-git-load-error-github-exception', (aAnsw) => {
+    emitter.on('database-db-load-error-github-exception', (aAnsw) => {
       oThis.bShowErrorWindow = true
       oThis.sErrorWindowTitle = "Ошибка"
       oThis.sErrorWindowMessage = aAnsw[0]
     })
 
-    emitter.on('database-git-save-error', (aAnsw) => {
+    emitter.on('database-db-save-error', (aAnsw) => {
       oThis.bShowErrorWindow = true
       oThis.sErrorWindowTitle = "Ошибка"
       oThis.sErrorWindowMessage = aAnsw[0]
@@ -179,7 +179,7 @@ export default {
       if (e.ctrlKey && e.key === 's') {
           e.preventDefault();
           _l('CTRL + S');
-          emitter.emit('database-git-save')
+          emitter.emit('database-db-save')
       }
     });
   }

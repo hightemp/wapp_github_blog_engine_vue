@@ -3,10 +3,12 @@ import { encode, decode } from 'js-base64';
 
 import { emitter } from './EventBus'
 
+import { FileSystemDriver } from "./FileSystemDriver"
+
 export class Database {
     static aReposList = [
         /**
-         * { "login": "", "repo": "", "key": "" }
+         * { "login": "", "repo": "", "key": "", type: "", url: "" }
          */
     ]
 
@@ -86,41 +88,8 @@ export class Database {
         // Database.oDatabase = Database.oDefaultDatabase
     }
 
-    // NOTE: Константы
-    static DATABASE_PATH = "notes-database.json"
-    static DATABASE_UPDATE_TIMEOUT = 30000
-
-    static SHA = ""
     static sFilePath = ''
     
-    // NOTE: Базовые объекты
-    /** @var Octokit octokit */
-    static octokit = null
-
-    // NOTE: Переменные - Данные
-
-    // ===============================================================
-
-    static get sLogin() {
-        return Database.aReposList[Database.iSelectedRepo].login
-    }
-
-    static get sRepo() {
-        return Database.aReposList[Database.iSelectedRepo].repo
-    }
-
-    static get sAPIKey() {
-        return Database.aReposList[Database.iSelectedRepo].key
-    }
-
-    // static get octokit() {
-    //     Database._octokit = new Octokit({
-    //         auth: Database.sAPIKey,
-    //     });
-
-    //     return Database._octokit
-    // }
-
     // ===============================================================
 
     static fnLoadReposList()
@@ -171,7 +140,7 @@ export class Database {
             Database.iSelectedRepo = iRepoIndex
             _l('fnSelectRepo')
 
-            Database.fnInitGit()
+            FileSystemDriver.fnInit(Database.aReposList[iRepoIndex])
 
             emitter.emit('database-repos-selected')
             emitter.emit('database-repos-save')
@@ -253,7 +222,7 @@ export class Database {
 
     static fnInit()
     {
-        emitter.on('app-created', Database.fnFirstLoadDatabase)
+        // emitter.on('app-created', Database.fnFirstLoadDatabase)
         emitter.on('database-repos-load', Database.fnLoadReposList)
         emitter.on('database-repos-save', Database.fnSaveReposList)
         emitter.on('database-repos-update', Database.fnUpdateRepo)
@@ -261,9 +230,12 @@ export class Database {
         emitter.on('database-repos-add', Database.fnAddRepo)
         emitter.on('database-repos-select', Database.fnSelectRepo)
         emitter.on('database-repos-clean', Database.fnCleanRepo)
-        emitter.on('database-load', Database.fnGetNotesDatabase)
-        emitter.on('database-get-sha', Database.fnGetSHADatabase)
-        emitter.on('database-save', Database.fnWriteNotesDatabase)
+        // emitter.on('database-load', FileSystemDriver.fnReadDatabase)
+        // emitter.on('database-save', FileSystemDriver.fnWriteDatabase)
+
+        emitter.on('database-repos-selected', Database.fnReadDatabase)
+        emitter.on('database-db-load', Database.fnReadDatabase)
+        emitter.on('database-db-save', Database.fnWriteDatabase)
 
         emitter.on('database-article-list', Database.fnGetArticlesList)
         emitter.on('database-article-list-filter', Database.fnFilterArticlesList)
@@ -315,10 +287,6 @@ export class Database {
         emitter.on('database-link-add', Database.fnCreateLink)
         emitter.on('database-link-select', Database.fnSelectLink)
 
-        emitter.on('database-repos-selected', Database.fnGetNotesDatabase)
-        emitter.on('database-git-load', Database.fnGetNotesDatabase)
-        emitter.on('database-git-save', Database.fnWriteNotesDatabase)
-
         emitter.on('database-article-open-url', Database.fnOpenArticleURL)
 
         // emitter.emit('database-repos-load')
@@ -326,107 +294,19 @@ export class Database {
 
     // ===============================================================
 
-    static fnFirstLoadDatabase()
+    static fnReadDatabase()
     {
-        _s('Database.fnFirstLoadDatabase')
-
-        // return Database
-        //     // Нужно получить SHA и данные
-        //     .fnGetNotesDatabase()
-        //     .then(() => {
-        //         _s('Database.fnFirstLoadDatabase.then')
-        //         emitter.emit('database-first-loaded')
-        //     })
-        //     .catch((...aAnsw) => {
-        //         _s('Database.fnFirstLoadDatabase.catch')
-        //         _l('Database.fnFirstLoadDatabase.catch', aAnsw)
-        //         emitter.emit('database-first-error', aAnsw)
-        //     })        
+        FileSystemDriver
+            .fnReadDatabase()
+            .then((oDatabase) => {
+                Database.oDatabase = oDatabase
+            })
     }
 
-    // ===============================================================
-
-    static fnGetSHADatabase()
+    static fnWriteDatabase()
     {
-        return new Promise((fnResolv, fnReject) => {
-            if (!Database.SHA) {
-                Database.octokit.rest.repos.getContent({
-                    owner: Database.sLogin,
-                    repo: Database.sRepo,
-                    path: Database.DATABASE_PATH,
-                })
-                .then(({ data }) => {
-                    Database.SHA = data.sha
-                    fnResolv(Database.SHA)
-                    emitter.emit('database-get-sha-success')
-                })
-                .catch((e) => {
-                    fnReject(e)
-                    emitter.emit('database-get-sha-error')
-                })
-            }
-        })
-    }
-
-    static fnGetNotesDatabase()
-    {
-        _l([Database.sLogin, Database.sRepo, Database.DATABASE_PATH])
-        return Database.octokit.rest.repos.getContent({
-            owner: Database.sLogin,
-            repo: Database.sRepo,
-            path: Database.DATABASE_PATH,
-        }).then(({ data }) => {
-            _l('fnGetNotesDatabase', data)
-            Database.oDatabase = JSON.parse(decode(data.content))
-            Database.oDatabase = Database.oDefaultDatabase
-            Database.SHA = data.sha
-            _l('fnGetNotesDatabase', Database.oDatabase)
-            emitter.emit('database-git-loaded')
-        }).catch((...aAnsw) => {
-            emitter.emit('database-git-load-error', aAnsw)
-
-            if (/Not Found/.test(aAnsw[0])) {
-                emitter.emit('database-git-load-error-notfound', aAnsw)
-
-                emitter.emit('database-git-save')
-            } else {
-                emitter.emit('database-git-load-error-github-exception', aAnsw)
-            }
-        })
-    }
-
-    static fnWriteNotesDatabase()
-    {
-        _s('Database.fnWriteNotesDatabase')
-        _l('fnWriteNotesDatabase', Database.oDatabase);
-        var sData = JSON.stringify(Database.oDatabase)
-        return Database.octokit.rest.repos.createOrUpdateFileContents({
-            owner: Database.sLogin,
-            repo: Database.sRepo,
-            path: Database.DATABASE_PATH,
-            sha: Database.SHA,
-            message: Database.fnGetUpdateMessage(),
-            content: encode(sData)
-        })
-        .then(() => {
-            emitter.emit('database-git-saved')
-        })
-        .catch((...aArgs) => {
-            emitter.emit('database-git-save-error', aArgs)
-        })
-    }
-
-    /**
-     * Автоматическое сохранение
-     */
-    static fnUpdateNoteDatabase()
-    {
-        // if (Database.bDirty) {
-        //     Editor.fnPrepareEditorContents()
-        //     Database.fnWriteNotesDatabase()
-        // }
-        // Database.fnGetSHADatabase()
-        // setTimeout(Database.fnUpdateNoteDatabase, Database.DATABASE_UPDATE_TIMEOUT);
+        FileSystemDriver
+            .fnWriteDatabase()
     }
 
     // ===============================================================
@@ -817,10 +697,6 @@ export class Database {
     {
         var sPath = Database.fnGetArticlePathURL(Database.sSelectedArticleID)
         window.open(`https://github.com/${Database.sLogin}/${Database.sRepo}/${sPath}`)
-    }
-
-    static fnGetUpdateMessage() {
-        return "update: "+(new Date())
     }
 
     // ===============================================================
