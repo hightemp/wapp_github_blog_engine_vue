@@ -66,7 +66,9 @@ export default {
     },
 
     watch: {
-
+        sCategoryGroup(sNew, sOld) {
+            emitter.emit('database-catalog-category-for-group-list', sNew)
+        }
     },
 
     methods: {
@@ -113,7 +115,6 @@ export default {
                 oThis.sGroupName = oThis.oItem.name
                 oThis.sCategoryGroup = oThis.oItem.group_id
                 oThis.sCategoryParent = oThis.oItem.parent_id
-                _l([oThis.sCategoryGroup, oThis.sCategoryParent])
             } else {
                 oThis.sGroupName = ""
                 oThis.sCategoryGroup = ""
