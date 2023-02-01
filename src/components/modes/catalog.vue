@@ -258,12 +258,15 @@ export default {
             oThis.oSelectedGroup = oI
             _l('???', [oThis.sGroupSelectedID, oThis.oSelectedGroup])
             emitter.emit('database-catalog-category-list-filter', oThis.sCategoryFilter)
+            emitter.emit('database-catalog-category-select', null)
+            emitter.emit('database-article-select', null)
         })
 
         emitter.on('database-catalog-category-selected', (sID, oI) => {
             oThis.sCategorySelectedID = sID
             oThis.oSelectedCategory = oI
             emitter.emit('database-catalog-article-list-filter', oThis.sArticleFilter)
+            emitter.emit('database-article-select', null)
         })
 
         emitter.on('database-catalog-article-selected', (sID, oI) => {
