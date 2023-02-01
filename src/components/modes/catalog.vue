@@ -186,13 +186,23 @@ export default {
                 this.fnFilterCategory()
             }
             if (oI.id == "add") {
-                emitter.emit('category-window-show', null)
+                emitter.emit('category-window-show', 
+                    null,
+                    oThis.oSelectedCategory,
+                    oThis.oSelectedGroup,
+                    oThis.oSelectedArticle
+                )
             }
             if (oI.id == "edit") {
                 if (!oThis.oSelectedCategory) {
                     alert('Нужно выбрать');
                 } else {
-                    emitter.emit('category-window-show', oThis.oSelectedCategory)
+                    emitter.emit('category-window-show', 
+                        oThis.oSelectedCategory,
+                        oThis.oSelectedCategory,
+                        oThis.oSelectedGroup,
+                        oThis.oSelectedArticle
+                    )
                 }
             }
             if (oI.id == "delete") {

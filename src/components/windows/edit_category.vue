@@ -87,11 +87,15 @@ export default {
             if (oThis.oItem) {
                 emitter.emit('database-catalog-category-update', {
                     ...oThis.oItem,
-                    name: oThis.sGroupName
+                    group_id: oThis.sCategoryGroup,
+                    parent_id: oThis.sCategoryParent,
+                    name: oThis.sCategoryName
                 })
             } else {
                 emitter.emit('database-catalog-category-add', {
-                    name: oThis.sGroupName
+                    group_id: oThis.sCategoryGroup,
+                    parent_id: oThis.sCategoryParent,
+                    name: oThis.sCategoryName
                 })
             }
         }
@@ -105,20 +109,25 @@ export default {
         })
 
         emitter.on('database-catalog-category-for-group-list-loaded', ({ aList }) => {
-            oThis.aCategoriesList = aList
+            oThis.aCategoriesList = [{id:null, name:'<Нет>'}].concat(aList)
         })
 
-        emitter.on('category-window-show', (oI) => {
-            oThis.oItem = oI
+        emitter.on('category-window-show', (oCurrentCategory, oCategory, oGroup) => {
+            oThis.oItem = oCurrentCategory
+
+            if (!oGroup) {
+                alert('Нужно выбрать группу')
+                return
+            }
 
             if (oThis.oItem) {
-                oThis.sGroupName = oThis.oItem.name
+                oThis.sCategoryName = oThis.oItem.name
                 oThis.sCategoryGroup = oThis.oItem.group_id
                 oThis.sCategoryParent = oThis.oItem.parent_id
             } else {
-                oThis.sGroupName = ""
-                oThis.sCategoryGroup = ""
-                oThis.sCategoryParent = ""
+                oThis.sCategoryName = ""
+                oThis.sCategoryGroup = oGroup.id
+                oThis.sCategoryParent = oCategory ? oCategory.id : oCategory
             }
 
             emitter.emit('database-catalog-category-group-list')

@@ -611,19 +611,29 @@ export class Database {
         })
     }
 
-    static fnUpdateCategory(iIndex, oItem)
+    static fnUpdateCategory(oItem)
     {
-        
+        var oNewItem = {...oItem}
+        var iI = Database.oDatabase.categories.findIndex((oI) => oNewItem.id == oI.id)
+        Database.oDatabase.categories.splice(iI, 1, oNewItem)
+        emitter.emit('database-catalog-category-saved')
     }
 
     static fnRemoveCategory(iIndex)
     {
-        
+        var iI = Database.oDatabase.categories.findIndex((oI) => sID == oI.id)
+        Database.oDatabase.categories.splice(iI, 1)
+        emitter.emit('database-catalog-category-removed')
     }
 
-    static fnCreateCategory()
+    static fnCreateCategory(oItem)
     {
-        
+        Database.oDatabase.categories_last_id++
+        Database.oDatabase.categories.push({
+            id: Database.oDatabase.categories_last_id,
+            ...oItem
+        })
+        emitter.emit('database-catalog-category-saved')
     }
 
     // ===============================================================
