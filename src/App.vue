@@ -1,5 +1,7 @@
 <template>
-    <div class="wrapper">
+    <div 
+      class="wrapper"
+    >
         <div class="top-panel">
           <div>
             <template v-if="oRepo"> 
@@ -32,6 +34,7 @@
     <EditGroup/>
     <EditCategory/>
     <EditArticle/>
+    <EditLink/>
 
     <SavedToast/>
 </template>
@@ -49,6 +52,7 @@ import AskAPIWindow from "./components/windows/ask_api.vue"
 import EditGroup from "./components/windows/edit_group.vue"
 import EditCategory from "./components/windows/edit_category.vue"
 import EditArticle from "./components/windows/edit_article.vue"
+import EditLink from "./components/windows/edit_link.vue"
 
 import PageEditor from "./components/editor.vue"
 import SavedToast from "./components/toasts/saved.vue"
@@ -74,6 +78,7 @@ export default {
     EditGroup,
     EditCategory,
     EditArticle,
+    EditLink,
   },
 
   data() {
@@ -121,11 +126,20 @@ export default {
     },
     fnSaveAll() {
       emitter.emit('database-db-save')
-    }
+    },
   },
 
   mounted() {
     var oThis = this
+
+    document.addEventListener('keydown', e => {
+      _l('keydown')
+      if (e.ctrlKey && e.keyCode === 83) {
+          e.preventDefault();
+          _l('CTRL + S');
+          oThis.fnSaveAll()
+      }
+    });
   },
 
   created() {
@@ -178,14 +192,6 @@ export default {
         oThis.oRepo = null
       }
     })
-
-    document.addEventListener('keyup keydown', e => {
-      if (e.ctrlKey && e.key === 's') {
-          e.preventDefault();
-          _l('CTRL + S');
-          emitter.emit('database-db-save')
-      }
-    });
   }
 }
 </script>

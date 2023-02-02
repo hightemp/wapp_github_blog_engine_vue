@@ -3,10 +3,10 @@
     <div class="links-panel">
         <div class="actions-panel">
             <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="" v-model="sFilter" @input="fnFilter">
-            <Dropdown :items="aDropdownMenu" />
+            <Dropdown :items="aDropdownMenu" @clickitem="fnClickItem" />
         </div>
         <div class="list">
-            <template v-for="(oI, iI) in aList" :key="oI.id">
+            <template v-for="oI in aList" :key="oI.id">
                 <div :class="'input-group item-row item-links-row '+(oI.id == sSelectedID ? 'active' : '')" @click="fnSelect(oI.id)">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
@@ -46,7 +46,9 @@ export default {
         return {
             aList: [],
             sFilter: "",
+
             sSelectedID: null,
+            oSelectedLink: null,
 
             aDropdownMenu: [
                 { id:"reload", title:'<i class="bi bi-arrow-repeat"></i> Обновить' },
@@ -67,15 +69,44 @@ export default {
         fnSelect(sID)
         {
             emitter.emit('database-link-select', sID)
-        }
+        },
+        fnClickItem(oI) {
+            var oThis = this
+
+            if (oI.id == "reload") {
+                this.fnFilter()
+            }
+            if (oI.id == "add") {
+                emitter.emit('link-window-show', 
+                    null,
+                )
+            }
+            if (oI.id == "edit") {
+                if (!oThis.oSelectedLink) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('link-window-show', 
+                        oThis.oSelectedLink,
+                    )
+                }
+            }
+            if (oI.id == "delete") {
+                if (!oThis.oSelectedLink) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('database-link-remove', oThis.oSelectedLink.id)
+                }
+            }
+        },
     },
 
     created() {
         var oThis = this
         _l('created')
 
-        emitter.on('database-link-selected', (sID) => {
+        emitter.on('database-link-selected', (sID, oI) => {
             oThis.sSelectedID = sID
+            oThis.oSelectedLink = oI
         })
 
         emitter.on('database-repos-load', () => {
@@ -85,6 +116,10 @@ export default {
         emitter.on('database-link-list-filter-loaded', ({aList, sSelectedID}) => {
             oThis.aList = aList
             oThis.sSelectedID = sSelectedID
+        })
+
+        emitter.on('database-link-list-filter-reload', () => {
+            oThis.fnFilter()
         })
     }
 }

@@ -417,7 +417,7 @@ export class Database {
             oA.html = sContent
         }
         emitter.emit('database-article-saved')
-        emitter.emit('database-db-save')
+        // emitter.emit('database-db-save')
     }
 
     // ===============================================================
@@ -661,7 +661,10 @@ export class Database {
     static fnSelectLink(sID)
     {
         Database.iSelectedLink = sID
-        emitter.emit('database-link-selected', Database.iSelectedLink)
+        emitter.emit('database-link-selected', 
+            Database.iSelectedLink,
+            Database.fnGetCurrentLink()
+        )
     }
 
     static fnGetLinkList()
@@ -681,19 +684,29 @@ export class Database {
         })
     }
 
-    static fnUpdateLink(iIndex, oItem)
+    static fnUpdateLink(oItem)
     {
-        
+        var oNewItem = {...oItem}
+        var iI = Database.oDatabase.links.findIndex((oI) => oNewItem.id == oI.id)
+        Database.oDatabase.links.splice(iI, 1, oNewItem)
+        emitter.emit('database-link-saved')
     }
 
-    static fnRemoveLink(iIndex)
+    static fnRemoveLink(sID)
     {
-        
+        var iI = Database.oDatabase.links.findIndex((oI) => sID == oI.id)
+        Database.oDatabase.links.splice(iI, 1)
+        emitter.emit('database-link-removed')
     }
 
-    static fnCreateLink()
+    static fnCreateLink(oItem)
     {
-        
+        Database.oDatabase.links_last_id++
+        Database.oDatabase.links.push({
+            id: Database.oDatabase.links_last_id,
+            ...oItem
+        })
+        emitter.emit('database-link-saved')
     }
 
     // ===============================================================
@@ -848,6 +861,11 @@ export class Database {
     static fnGetCurrentArticle()
     {
         return Database.oDatabase.articles.find((oI) => oI.id==Database.sSelectedArticleID)
+    }
+
+    static fnGetCurrentLink()
+    {
+        return Database.oDatabase.links.find((oI) => oI.id==Database.iSelectedLink)
     }
 
     static fnFilterCategoriesByGroup(iGroupID)

@@ -11,7 +11,11 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="" class="form-label">Название</label>
-                        <input type="text" class="form-control"  aria-describedby="" v-model="sGroupName">
+                        <input type="text" class="form-control"  aria-describedby="" v-model="sName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="" class="form-label">URL</label>
+                        <input type="text" class="form-control"  aria-describedby="" v-model="sURL">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -29,7 +33,7 @@
 import { emitter } from "../../EventBus"
 
 export default {
-    name: "EditGroup",
+    name: "EditLink",
 
     props: {},
 
@@ -39,7 +43,7 @@ export default {
 
             oItem: null,
 
-            sGroupName: "",
+            sName: "",
         }
     },
 
@@ -51,19 +55,21 @@ export default {
         fnSave() {
             var oThis = this
 
-            emitter.once('database-catalog-group-saved', () => {
+            emitter.once('database-link-saved', () => {
                 oThis.fnClose()
-                emitter.emit('database-catalog-group-list-filter-reload')
+                emitter.emit('database-link-list-filter-reload')
             })
 
             if (oThis.oItem) {
-                emitter.emit('database-catalog-group-update', {
+                emitter.emit('database-link-update', {
                     ...oThis.oItem,
-                    name: oThis.sGroupName
+                    name: oThis.sName,
+                    url: oThis.sURL,
                 })
             } else {
-                emitter.emit('database-catalog-group-add', {
-                    name: oThis.sGroupName
+                emitter.emit('database-link-add', {
+                    name: oThis.sName,
+                    url: oThis.sURL,
                 })
             }
         }
@@ -72,18 +78,20 @@ export default {
     created() {
         var oThis = this
 
-        emitter.on('group-window-show', (oI) => {
+        emitter.on('link-window-show', (oI) => {
             oThis.oItem = oI
 
             if (oThis.oItem) {
-                oThis.sGroupName = oThis.oItem.name
+                oThis.sName = oThis.oItem.name
+                oThis.sURL = oThis.oItem.url
             } else {
-                oThis.sGroupName = null
+                oThis.sName = ""
+                oThis.sURL = ""
             }
 
             oThis.bShowWindow = true
         })
-        emitter.on('group-window-close', () => {
+        emitter.on('link-window-close', () => {
             oThis.bShowWindow = false
         })
     }
