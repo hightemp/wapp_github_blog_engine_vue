@@ -330,13 +330,16 @@ export class Database {
     static fnSelectArticle(sID)
     {
         Database.sSelectedArticleID = sID
-        var oArticle = Database.fnGetCurrentArticle()
+        var oArticle = null 
         var oCategory = null
         var oGroup = null
-        if (oArticle.category_id) {
-            oCategory = Database.fnGetArticleCategory(oArticle.category_id)
-            if (oCategory.group_id) {
-                oGroup = Database.fnGetArticleGroup(oCategory.group_id)
+        if (sID) {
+            oArticle = Database.fnGetCurrentArticle()
+            if (oArticle.category_id) {
+                oCategory = Database.fnGetArticleCategory(oArticle.category_id)
+                if (oCategory.group_id) {
+                    oGroup = Database.fnGetArticleGroup(oCategory.group_id)
+                }
             }
         }
 

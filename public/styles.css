@@ -123,6 +123,11 @@ body, html {
 .page-actions-panel {
 }
 
+.actions-panel-spacer {
+    flex: 1;
+    width: 100%;
+}
+
 .current-mode {
     border-left: 1px solid #eee;
     display: flex;

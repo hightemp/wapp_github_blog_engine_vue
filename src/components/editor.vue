@@ -7,6 +7,8 @@
             <button :class="'btn '+(sCurrentTab=='tags' ? 'btn-primary' : '')" @click="sCurrentTab='tags'"><i class="bi bi-tags"></i></button>
             <button :class="'btn '+(sCurrentTab=='images' ? 'btn-primary' : '')" @click="sCurrentTab='images'"><i class="bi bi-image"></i></button>
             <button :class="'btn '+(sCurrentTab=='comments' ? 'btn-primary' : '')" @click="sCurrentTab='comments'"><i class="bi bi-journal-text"></i></button>
+            <div class="actions-panel-spacer"></div>
+            <button class="btn btn-danger" @click="fnClose"><i class="bi bi-x"></i></button>
         </div>
         <div class="tab-page" v-show="sCurrentTab=='page'">
             <ckeditor 
@@ -121,6 +123,9 @@ export default {
         },
         fnCommentsFilter() {
 
+        },
+        fnClose() {
+            emitter.emit('database-article-select', null)
         }
     },
 
