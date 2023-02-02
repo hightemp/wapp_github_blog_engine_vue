@@ -42,7 +42,11 @@ export default {
         return {
             aList: [],
             sFilter: "",
+
             sSelectedID: null,
+            oSelectedArticle: null,
+            oSelectedCategory: null,
+            oSelectedGroup: null,
 
             aDropdownMenu: [
                 { id:"reload", title:'<i class="bi bi-arrow-repeat"></i> Обновить' },
@@ -70,18 +74,37 @@ export default {
         },
         fnMenuItemClick(oI)
         {
+            var oThis = this
+
             if (oI.id == "reload") {
                 this.fnFilter()
             }
             if (oI.id == "add") {
-                alert('123')
+                emitter.emit('article-window-show', 
+                    null,
+                    oThis.oSelectedCategory,
+                    oThis.oSelectedGroup,
+                    oThis.oSelectedArticle
+                )
             }
             if (oI.id == "edit") {
+                if (!oThis.oSelectedArticle) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('article-window-show', 
+                        oThis.oSelectedArticle,
+                        oThis.oSelectedCategory,
+                        oThis.oSelectedGroup,
+                        oThis.oSelectedArticle
+                    )
+                }
             }
             if (oI.id == "delete") {
-            }
-            if (oI.id == "favorites") {
-                this.fnAddToFavorites()
+                if (!oThis.oSelectedArticle) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('database-article-remove', oThis.oSelectedArticle.id)
+                }
             }
         }
     },
@@ -90,8 +113,11 @@ export default {
         var oThis = this
         _l('created')
 
-        emitter.on('database-catalog-article-selected', (sID) => {
+        emitter.on('database-catalog-article-selected', (sID, oA, oC, oG) => {
             oThis.sSelectedID = sID
+            oThis.oSelectedArticle = oA
+            oThis.oSelectedCategory = oC
+            oThis.oSelectedGroup = oG
         })
 
         emitter.on('database-repos-load', () => {
@@ -101,6 +127,10 @@ export default {
         emitter.on('database-article-list-filter-loaded', ({aList, sSelectedID}) => {
             oThis.aList = aList
             oThis.sSelectedID = sSelectedID
+        })
+
+        emitter.on('database-catalog-article-list-filter-reload', () => {
+            oThis.fnFilter()
         })
         // emitter.on('database-article-list-loaded', ({aList, sSelectedID}) => {
         //     oThis.aList = aList

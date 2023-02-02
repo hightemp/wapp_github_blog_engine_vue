@@ -330,9 +330,22 @@ export class Database {
     static fnSelectArticle(sID)
     {
         Database.sSelectedArticleID = sID
+        var oArticle = Database.fnGetCurrentArticle()
+        var oCategory = null
+        var oGroup = null
+        if (oArticle.category_id) {
+            oCategory = Database.fnGetArticleCategory(oArticle.category_id)
+            if (oCategory.group_id) {
+                oGroup = Database.fnGetArticleGroup(oCategory.group_id)
+            }
+        }
+
+        _l('>>>', [oArticle, oCategory, oGroup])
         emitter.emit('database-catalog-article-selected', 
             Database.sSelectedArticleID, 
-            Database.fnGetCurrentArticle()
+            oArticle,
+            oCategory,
+            oGroup
         )
     }
 
@@ -400,7 +413,9 @@ export class Database {
     static fnSaveCurrentArticle(sContent)
     {
         var oA = Database.fnGetCurrentArticle()
-        oA.html = sContent
+        if (oA) {
+            oA.html = sContent
+        }
         emitter.emit('database-article-saved')
         emitter.emit('database-db-save')
     }
@@ -700,6 +715,16 @@ export class Database {
     }
 
     // ===============================================================
+
+    static fnGetArticleCategory(sID)
+    {
+        return Database.oDatabase.categories.filter((oI) => oI.id == sID)[0]
+    }
+
+    static fnGetArticleGroup(sID)
+    {
+        return Database.oDatabase.groups.filter((oI) => oI.id == sID)[0]
+    }
 
     static fnFilterCurrentCategories(sFilter)
     {

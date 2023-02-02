@@ -113,19 +113,19 @@ export default {
         emitter.on('article-window-show', (oCurrentArticle, oCategory, oGroup) => {
             oThis.oItem = oCurrentArticle
 
-            if (!oCategory) {
-                alert('Нужно выбрать группу')
-                return
-            }
+            // if (!oCategory) {
+            //     alert('Нужно выбрать группу')
+            //     return
+            // }
 
             if (oThis.oItem) {
                 oThis.sArticleName = oThis.oItem.name
-                oThis.sCategoryGroup = oGroup.id
+                oThis.sCategoryGroup = oGroup ? oGroup.id : null
                 oThis.sCategoryParent = oThis.oItem.category_id
             } else {
                 oThis.sArticleName = ""
-                oThis.sCategoryGroup = oGroup.id
-                oThis.sCategoryParent = oCategory.id
+                oThis.sCategoryGroup = oGroup ? oGroup.id : null
+                oThis.sCategoryParent = oCategory ? oCategory.id : null
             }
 
             emitter.emit('database-catalog-category-group-list')
