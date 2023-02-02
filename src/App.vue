@@ -9,11 +9,12 @@
             </template>
           </div>
           <div class="top-right-panel">
-            <button class="" @click="fnSaveAll" title="Сохранить все"><i class="bi bi-cloud-arrow-up"></i></button>
-            <button class="" @click="fnShowRepoWindow" title="Выбрать другую сессию"><i class="bi bi-person-fill"></i></button>
           </div>
         </div>
         <div class="app-modes">
+          <button class="btn" @click="fnShowRepoWindow" title="Выбрать другую сессию"><i class="bi bi-person-fill"></i></button>
+          <button class="btn" @click="fnSaveAll" title="Сохранить все"><i class="bi bi-cloud-arrow-up"></i></button>
+          <hr/>
           <a v-for="oMenuItem in aMenu" :key="oMenuItem.class" :class="(sCurrentMode==oMenuItem.class ? 'btn-primary' : '') + ' btn '+oMenuItem.class" :title="oMenuItem.title" @click="fnMenuItemClick(oMenuItem)"><i :class="'bi '+oMenuItem.icon"></i></a>
         </div>
         <div class="current-mode">
