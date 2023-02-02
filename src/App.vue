@@ -35,6 +35,7 @@
     <EditCategory/>
     <EditArticle/>
     <EditLink/>
+    <EditTag/>
 
     <SavedToast/>
 </template>
@@ -53,6 +54,7 @@ import EditGroup from "./components/windows/edit_group.vue"
 import EditCategory from "./components/windows/edit_category.vue"
 import EditArticle from "./components/windows/edit_article.vue"
 import EditLink from "./components/windows/edit_link.vue"
+import EditTag from "./components/windows/edit_tag.vue"
 
 import PageEditor from "./components/editor.vue"
 import SavedToast from "./components/toasts/saved.vue"
@@ -79,6 +81,7 @@ export default {
     EditCategory,
     EditArticle,
     EditLink,
+    EditTag,
   },
 
   data() {

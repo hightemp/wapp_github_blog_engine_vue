@@ -548,7 +548,8 @@ export class Database {
     {
         Database.iSelectedTag = sID
         emitter.emit('database-tag-selected', 
-            Database.iSelectedTag
+            Database.iSelectedTag,
+            Database.fnGetCurrentTag()
         )
     }
 
@@ -587,19 +588,30 @@ export class Database {
         })
     }
 
-    static fnUpdateTag(iIndex, oItem)
+    static fnUpdateTag(oItem)
     {
-        
+        var oNewItem = {...oItem}
+        var iI = Database.oDatabase.tags.findIndex((oI) => oNewItem.id == oI.id)
+        Database.oDatabase.tags.splice(iI, 1, oNewItem)
+        emitter.emit('database-tag-saved')
     }
 
-    static fnRemoveTag(iIndex)
+    static fnRemoveTag(sID)
     {
-        
+        var iI = Database.oDatabase.tags.findIndex((oI) => sID == oI.id)
+        Database.oDatabase.tags.splice(iI, 1)
+        Database.oDatabase.tags_relations = Database.oDatabase.tags_relations.filter((oI) => oI.tag_id != sID)
+        emitter.emit('database-tag-removed')
     }
 
-    static fnCreateTag()
+    static fnCreateTag(oItem)
     {
-        
+        Database.oDatabase.tags_last_id++
+        Database.oDatabase.tags.push({
+            id: Database.oDatabase.tags_last_id,
+            ...oItem
+        })
+        emitter.emit('database-tag-saved')
     }
 
     static fnArticleRemoveTags(iArticleID, aIDs)
@@ -866,6 +878,11 @@ export class Database {
     static fnGetCurrentLink()
     {
         return Database.oDatabase.links.find((oI) => oI.id==Database.iSelectedLink)
+    }
+
+    static fnGetCurrentTag()
+    {
+        return Database.oDatabase.tags.find((oI) => oI.id==Database.iSelectedTag)
     }
 
     static fnFilterCategoriesByGroup(iGroupID)

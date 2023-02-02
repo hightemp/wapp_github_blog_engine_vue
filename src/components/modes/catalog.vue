@@ -287,13 +287,23 @@ export default {
         })
 
         emitter.on('database-catalog-category-list-filter-loaded', ({aList, sSelectedID}) => {
-            oThis.aCategoryList = aList
-            oThis.sCategorySelectedID = sSelectedID
+            if (oThis.oSelectedGroup) {
+                oThis.aCategoryList = aList
+                oThis.sCategorySelectedID = sSelectedID
+            } else {
+                oThis.aCategoryList = []
+                oThis.sCategorySelectedID = null
+            }
         })
 
         emitter.on('database-catalog-article-list-filter-loaded', ({aList, sSelectedID}) => {
-            oThis.aArticleList = aList
-            oThis.sArticleSelectedID = sSelectedID
+            if (oThis.oSelectedCategory) {
+                oThis.aArticleList = aList
+                oThis.sArticleSelectedID = sSelectedID
+            } else {
+                oThis.aArticleList = []
+                oThis.sArticleSelectedID = null
+            }
         })
 
 

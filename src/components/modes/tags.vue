@@ -3,7 +3,7 @@
     <div class="tags-panel">
         <div class="actions-panel">
             <input type="text" class="form-control" @input="fnFilterTag"  v-model="sTagFilter">
-            <Dropdown :items="aTagDropdownMenu" />
+            <Dropdown :items="aTagDropdownMenu" @clickitem="fnTagClickItem" />
         </div>
         <div class="list">
             <template v-for="(oI, iI) in aTagsList" :key="oI.id">
@@ -23,7 +23,7 @@
     <div class="tags-articles-panel">
         <div class="actions-panel">
             <input type="text" class="form-control" @input="fnFilterArticle"  v-model="sArticleFilter">
-            <Dropdown :items="aArticleDropdownMenu" />
+            <!--Dropdown :items="aArticleDropdownMenu" /-->
         </div>
         <div class="list">
             <template v-for="oI in aArticlesList" :key="oI.id">
@@ -63,6 +63,8 @@ export default {
             sTagSelectedID: null,
             sArticleSelectedID: null,
 
+            oSelectedTag: null,
+
             aTagsList: [],
             aArticlesList: [],
 
@@ -101,6 +103,30 @@ export default {
         {
             emitter.emit('database-article-select', sID)
         },
+        fnTagClickItem(oI) {
+            var oThis = this
+
+            if (oI.id == "reload") {
+                this.fnFilterTag()
+            }
+            if (oI.id == "add") {
+                emitter.emit('tag-window-show', null)
+            }
+            if (oI.id == "edit") {
+                if (!oThis.oSelectedTag) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('tag-window-show', oThis.oSelectedTag)
+                }
+            }
+            if (oI.id == "delete") {
+                if (!oThis.oSelectedTag) {
+                    alert('Нужно выбрать');
+                } else {
+                    emitter.emit('database-tag-remove', oThis.oSelectedTag.id)
+                }
+            }
+        },
     },
 
     created() {
@@ -111,8 +137,10 @@ export default {
             oThis.sArticleSelectedID = sID
         })
 
-        emitter.on('database-tag-selected', (sID) => {
+        emitter.on('database-tag-selected', (sID, oI) => {
+            _l('database-tag-selected', [sID, oI])
             oThis.sTagSelectedID = sID
+            oThis.oSelectedTag = oI
             emitter.emit('database-tag-article-list-filter', oThis.sArticleFilter)
         })
 
@@ -131,6 +159,15 @@ export default {
             oThis.aTagsList = aList
             oThis.sTagSelectedID = sSelectedID
         })
+
+        emitter.on('database-tag-removed', () => {
+            oThis.fnFilterTag()
+        })
+
+        emitter.on('database-tag-list-filter-reload', () => {
+            oThis.fnFilterTag()
+        })
+        
         // emitter.on('database-article-list-loaded', ({aList, iSelectedArticle}) => {
         //     oThis.aList = aList
         //     oThis.sSelectedID = iSelectedArticle
