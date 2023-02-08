@@ -3,7 +3,7 @@
     <div class="favorites-panel">
         <div class="actions-panel">
             <input type="text" class="form-control" v-model="sFavFilter">
-            <Dropdown :items="aDropdownMenu" clickitem="fnArticleClickItem" />
+            <Dropdown :items="aDropdownMenu" @clickitem="fnArticleClickItem" />
         </div>
         <div class="list">
             <template v-for="oI in aFavList" :key="oI.id">
@@ -39,7 +39,7 @@ export default {
         ...mapState(a`sSelectedArticleID oDatabase`),
         ...mapGetters(a`oCurrentArticle fnGetCategory`), 
         aFavList() {
-            return this.$store.state.oDatabase.favorites.map((oI) => this.$store.state.oDatabase.articles.find((oAI) => oAI.id == oI.article_id)).filter((oI) => ~oI.name.indexOf(this.sFavFilter))
+            return this.$store.state.oDatabase.favorites.map((oI) => this.$store.state.oDatabase.articles.find((oAI) => oAI.id == oI.article_id)).filter((oI) => ~oI?.name.indexOf(this.sFavFilter))
         },
     },
 
@@ -57,8 +57,8 @@ export default {
     },
 
     methods: {
-        ...mapMutations(a`fnShowArticleEditWindow fnRemoveArticle`),
-        ...mapActions(a`fnSelectArticle`),
+        ...mapMutations(a`fnShowArticleEditWindow`),
+        ...mapActions(a`fnSelectArticle fnRemoveArticle fnRemoveFavorite`),
         fnArticleClickItem(oI) {
             if (oI.id == "add") {
                 this.fnShowArticleEditWindow(null)

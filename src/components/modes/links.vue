@@ -65,7 +65,8 @@ export default {
     },
 
     methods: {
-        ...mapMutations(a`fnSelectLink fnShowLinkEditWindow fnRemoveLink`),
+        ...mapMutations(a`fnSelectLink fnShowLinkEditWindow`),
+        ...mapActions(a`fnRemoveLink`),
         fnClickItem(oI) {
             var oThis = this
 

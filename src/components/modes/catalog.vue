@@ -117,8 +117,8 @@ export default {
     },
 
     methods: {
-        ...mapMutations(a`fnSelectGroup fnSelectCategory fnShowGroupEditWindow fnShowCategoryEditWindow fnShowArticleEditWindow fnRemoveGroup fnRemoveCategory fnRemoveArticle fnAddFavorite`),
-        ...mapActions(a`fnSelectArticle`),
+        ...mapMutations(a`fnSelectGroup fnSelectCategory fnShowGroupEditWindow fnShowCategoryEditWindow fnShowArticleEditWindow fnAddFavorite`),
+        ...mapActions(a`fnSelectArticle fnRemoveGroup fnRemoveCategory fnRemoveArticle`),
 
         fnSelectCategoryItem(oI) {
             this.fnSelectCategory(oI.id)

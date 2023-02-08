@@ -60,7 +60,8 @@ export default {
     },
 
     methods: {
-        ...mapMutations(a`fnSelectArticle fnShowArticleEditWindow fnRemoveArticle`),
+        ...mapMutations(a`fnSelectArticle fnShowArticleEditWindow`),
+        ...mapActions(a`fnRemoveArticle`),
         fnMenuItemClick(oI)
         {
             if (oI.id == "add") {
@@ -78,6 +79,13 @@ export default {
                     alert('Нужно выбрать');
                 } else {
                     this.fnRemoveArticle(this.oCurrentArticle)
+                }
+            }
+            if (oI.id == "favorites") {
+                if (!this.oCurrentArticle) {
+                    alert('Нужно выбрать');
+                } else {
+                    this.fnAddFavorite(this.oCurrentArticle)
                 }
             }
         }

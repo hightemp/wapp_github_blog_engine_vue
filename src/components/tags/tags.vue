@@ -78,8 +78,8 @@ export default {
     },
 
     methods: {
-        ...mapMutations(a`fnSelectTag fnShowTagEditWindow fnRemoveTag`),
-        ...mapActions(a`fnSelectArticle`),
+        ...mapMutations(a`fnSelectTag fnShowTagEditWindow`),
+        ...mapActions(a`fnSelectArticle fnRemoveTag`),
         fnAllTagsFilter() {
             
         },

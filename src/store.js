@@ -402,23 +402,23 @@ export default createStore({
         },
         fnRemoveGroup({ commit, getters }, oItem) {
             var iIndex = getters.fnGetGroupIndex(oItem.id)
-            commit('fnRemoveGroup', { iIndex, oItem })
+            commit('fnRemoveGroup', iIndex)
         },
-        fnRemoveCategory({ commit, getters }) {
+        fnRemoveCategory({ commit, getters }, oItem) {
             var iIndex = getters.fnGetCategoryIndex(oItem.id)
-            commit('fnRemoveCategory', { iIndex, oItem })
+            commit('fnRemoveCategory', iIndex)
         },
-        fnRemoveArticle({ commit, getters }) {
+        fnRemoveArticle({ commit, getters, state }, oItem) {
             var iIndex = getters.fnGetArticleIndex(oItem.id)
-            commit('fnRemoveArticle', { iIndex, oItem })
+            commit('fnRemoveArticle', iIndex)
         },
-        fnRemoveTag({ commit, getters }) {
+        fnRemoveTag({ commit, getters }, oItem) {
             var iIndex = getters.fnGetTagIndex(oItem.id)
-            commit('fnRemoveArticle', { iIndex, oItem })
+            commit('fnRemoveTag', iIndex)
         },
-        fnRemoveLink({ commit, getters }) {
+        fnRemoveLink({ commit, getters }, oItem) {
             var iIndex = getters.fnGetLinkIndex(oItem.id)
-            commit('fnRemoveArticle', { iIndex, oItem })
+            commit('fnRemoveLink', iIndex)
         },
 
         fnSelectArticle({ commit, state, getters }, sID) {

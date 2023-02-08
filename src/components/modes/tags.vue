@@ -82,8 +82,8 @@ export default {
     },
 
     methods: {
-        ...mapMutations(a`fnSelectTag fnShowTagEditWindow fnRemoveTag`),
-        ...mapActions(a`fnSelectArticle`),
+        ...mapMutations(a`fnSelectTag fnShowTagEditWindow`),
+        ...mapActions(a`fnSelectArticle fnRemoveTag`),
         fnTagClickItem(oI) {
             if (oI.id == "add") {
                 this.fnShowTagEditWindow(null)
