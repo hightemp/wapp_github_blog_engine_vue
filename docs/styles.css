@@ -29,19 +29,11 @@ body, html {
     left: 0px;
     right: 0px;
     bottom: 0px;
-    display: grid;
+    display: flex;
     background: #eee;
-    grid-template-columns: 30px 1fr 1fr; 
-    grid-template-rows: 20px 1fr 1fr; 
-    gap: 0px 0px; 
-    grid-template-areas: 
-        "a a a"
-        "b c d"
-        "b c d"; 
 }
 
 .top-panel {
-    grid-area: a;
     border-bottom: 1px solid rgba(0,0,0,0.1);
     display: grid;
     grid-template-columns: 1fr 43px;
@@ -61,9 +53,12 @@ body, html {
     background: white;
 }
 
+.app-modes {
+    width: 30px;
+}
+
 .app-modes > * {
     width: 100%;
-    grid-area: b;
 }
 
 .hidden {
@@ -131,7 +126,14 @@ body, html {
 .current-mode {
     border-left: 1px solid #eee;
     display: flex;
-    grid-area: c;
+    width: 50%;
+    flex: 1;
+}
+
+.editor-wrapper {
+    width: 50%;
+    flex: 1;
+    background: none;
 }
 
 .page-panel {
@@ -139,7 +141,6 @@ body, html {
     height: 100%;
     max-height: 100%;
     border-left: 1px solid #eee;
-    grid-area: d;
 }
 
 .mode {
@@ -172,7 +173,7 @@ body, html {
 
 .item-row {
     display: grid !important;
-    grid-template-columns: 32px 1fr;
+    /* grid-template-columns: 32px 1fr; */
     min-height: 25px;
     border-bottom: 1px solid #eee;
     text-align: left;
@@ -187,7 +188,11 @@ body, html {
 }
 
 .item-links-row {
-    grid-template-columns: 32px 1fr 3fr !important;
+    grid-template-columns: 1fr 3fr !important;
+}
+
+.item-artilces-list {
+    grid-template-columns: 1fr 1fr !important;
 }
 
 .item-image-row {
@@ -196,7 +201,7 @@ body, html {
 
 .item-tree-row {
     display: grid !important;
-    grid-template-columns: 32px 32px 1fr;
+    grid-template-columns: 1fr;
     min-height: 25px;
     border-bottom: 1px solid #eee;
     text-align: left;
@@ -227,8 +232,12 @@ a {
     cursor: pointer;
 }
 
-.active .list-group-item {
+.active {
     background: blue !important;
+    color: white !important;
+}
+
+.active * {
     color: white !important;
 }
 
@@ -238,11 +247,11 @@ a {
     overflow: hidden;
 }
 
-.tree-spacer::before {
+/* .tree-spacer::before {
     content: ".....................................................";
     overflow: hidden;
     font-size: 8px;
-}
+} */
 
 .ql-editor {
     max-height: 90vh;
@@ -364,7 +373,7 @@ a {
 }
 
 .left-tag-panel {
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1) !important;
 }
 
 .middle-tag-panel {
@@ -376,7 +385,7 @@ a {
 }
 
 .right-tag-panel {
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1) !important;
 }
 
 .link {
