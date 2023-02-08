@@ -117,7 +117,7 @@ export default {
     },
 
     methods: {
-        ...mapMutations(a`fnSelectGroup fnSelectCategory fnShowGroupEditWindow fnShowCategoryEditWindow fnShowArticleEditWindow fnRemoveGroup fnRemoveCategory fnRemoveArticle`),
+        ...mapMutations(a`fnSelectGroup fnSelectCategory fnShowGroupEditWindow fnShowCategoryEditWindow fnShowArticleEditWindow fnRemoveGroup fnRemoveCategory fnRemoveArticle fnAddFavorite`),
         ...mapActions(a`fnSelectArticle`),
 
         fnSelectCategoryItem(oI) {
@@ -177,6 +177,13 @@ export default {
                     alert('Нужно выбрать');
                 } else {
                     this.fnRemoveArticle(this.oCurrentArticle)
+                }
+            }
+            if (oI.id == "favorites") {
+                if (!this.oCurrentArticle) {
+                    alert('Нужно выбрать');
+                } else {
+                    this.fnAddFavorite(this.oCurrentArticle)
                 }
             }
         },

@@ -7,11 +7,14 @@
         <!-- <div class="input-group-text">
             <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
         </div> -->
-        <div class="input-group-text item-flag-group"><a class="item-flag" @click="fnToggleItem"><i class="bi bi-dash-square" v-show="bIsOpened"></i><i class="bi bi-plus-square" v-show="!bIsOpened"></i></a></div>
         <a 
             :class="'list-group-item list-group-item-action item-title '" 
         >
             <div class="tree-spacer" v-for="iI in iLevel" :key="iI"></div>
+            <a class="item-flag" @click="fnToggleItem">
+                <i class="bi bi-dash-square" v-show="bIsOpened"></i>
+                <i class="bi bi-plus-square" v-show="!bIsOpened"></i>
+            </a>
             <div class="item-inner-title">{{oItem.name}}</div>
         </a>
     </div>

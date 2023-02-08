@@ -201,7 +201,7 @@ body, html {
 
 .item-tree-row {
     display: grid !important;
-    grid-template-columns: 32px 1fr;
+    grid-template-columns: 1fr;
     min-height: 25px;
     border-bottom: 1px solid #eee;
     text-align: left;
@@ -237,17 +237,21 @@ a {
     color: white !important;
 }
 
+.active * {
+    color: white !important;
+}
+
 .tree-spacer {
     width: 8px;
     display: inline-block;
     overflow: hidden;
 }
 
-.tree-spacer::before {
+/* .tree-spacer::before {
     content: ".....................................................";
     overflow: hidden;
     font-size: 8px;
-}
+} */
 
 .ql-editor {
     max-height: 90vh;

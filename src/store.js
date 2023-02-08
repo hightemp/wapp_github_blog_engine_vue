@@ -332,6 +332,21 @@ export default createStore({
 
         fnSaveArticleContent(state, { iIndex, sContent }) {
             state.oDatabase.articles[iIndex].html = sContent
+        },
+
+        fnAddFavorite(state, oItem) {
+            if (~state.oDatabase.findIndex((oI) => oI.id == oItem.id)) {
+                return
+            }
+            state.oDatabase.articles_last_id++
+            state.oDatabase.favorites.push({ 
+                id: state.oDatabase.articles_last_id, 
+                article_id: oItem.id 
+            })
+        },
+        fnRemoveFavorite(state, oItem) {
+            var iI = state.oDatabase.favorites.findIndex((oI) => oI.article_id == oItem.id)
+            state.oDatabase.favorites.splice(iI, 1)
         }
     },
     actions: {
@@ -408,6 +423,7 @@ export default createStore({
 
         fnSelectArticle({ commit, state, getters }, sID) {
             commit('fnSelectArticle', sID)
+            _l(">>>", sID)
             if (sID) {
                 var sS = state.sSelectedArticleID
                 var iIndex = state.oDatabase.articles.findIndex((oI) => oI.id==sS)
@@ -613,6 +629,10 @@ export default createStore({
 
         fnFilterArticles: (state) => (sFilter) => {
             return state.oDatabase.articles.filter((oI) => ~oI.name.indexOf(sFilter))
+        },
+
+        fnFilterFavorites: (state, getters) => (sFilter) => {
+            return getters.fnGetFavorites().filter((oI) => ~oI.name.indexOf(sFilter))
         },
 
         fnFilterTags: (state) => (sFilter) => {
