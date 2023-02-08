@@ -1,5 +1,5 @@
 <template>
-<div v-show="bShowWindow">
+<div v-show="bShowCategoryEditWindow">
     <div class="block-overlay"></div>
     <div class="modal show" id="modal-edit-category" tabindex="-1">
         <div class="modal-dialog">
@@ -12,22 +12,22 @@
                     <div class="mb-3">
                         <label for="" class="form-label">Родительская группа</label>
                         <div>
-                            <select id="edit-category-group" class="form-control box1" aria-describedby=""  v-model="sCategoryGroup">
-                                <option v-for="oGroup in aAllGroupsList" :key="oGroup.id" :value="oGroup.id">{{oGroup.name}}</option>
+                            <select id="edit-category-group" class="form-control box1" aria-describedby=""  v-model="sCategoryEditWindowGroupID">
+                                <option v-for="oGroup in aGroupsList" :key="oGroup.id" :value="oGroup.id">{{oGroup.name}}</option>
                             </select>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="" class="form-label">Родительская категория</label>
                         <div>
-                            <select id="edit-category-parent" class="form-control box1" aria-describedby="" v-model="sCategoryParent">
+                            <select id="edit-category-parent" class="form-control box1" aria-describedby="" v-model="sCategoryEditWindowCategoryID">
                                 <option v-for="oCategory in aCategoriesList" :key="oCategory.id" :value="oCategory.id">{{oCategory.name}}</option>
                             </select>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="" class="form-label">Название</label>
-                        <input type="text" class="form-control" id="edit-category-name" aria-describedby="" v-model="sCategoryName">
+                        <input type="text" class="form-control" id="edit-category-name" aria-describedby="" v-model="sCategoryEditWindowCategoryName">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -41,104 +41,40 @@
 </template>
 
 <script>
-import { emitter } from "../../EventBus"
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
+
+import { a, cc } from "../../lib"
 
 export default {
     name: "EditCategory",
 
     props: {},
 
-    data() {
-        return {
-            bShowWindow: false,
-
-            oItem: null,
-
-            sCategoryName: "",
-
-            sCategoryGroup: null,
-            sCategoryParent: null,
-
-            aAllGroupsList: [],
-            aCategoriesList: [],
-
-        }
+    computed: {
+        ...mapState(a`bShowCategoryEditWindow`),
+        ...mapGetters(a`aGroupsList`),
+        ...cc(`sCategoryEditWindowCategoryName sCategoryEditWindowGroupID sCategoryEditWindowCategoryID`),
+        aCategoriesList() {
+            return this.$store.getters.fnFilterCategoriesByGroup(this.sCategoryEditWindowGroupID)
+        },
     },
 
-    watch: {
-        sCategoryGroup(sNew, sOld) {
-            emitter.emit('database-catalog-category-for-group-list', sNew)
+    data() {
+        return {
         }
     },
 
     methods: {
-        fnClose() {
-            var oThis = this
-            oThis.bShowWindow = false
-        },
+        ...mapMutations(a`fnHideCategoryEditWindow`),
+        ...mapActions(a`fnSaveCategory`),
         fnSave() {
-            var oThis = this
-
-            emitter.once('database-catalog-category-saved', () => {
-                oThis.fnClose()
-                emitter.emit('database-catalog-category-list-filter-reload')
-            })
-
-            if (oThis.oItem) {
-                emitter.emit('database-catalog-category-update', {
-                    ...oThis.oItem,
-                    group_id: oThis.sCategoryGroup,
-                    parent_id: oThis.sCategoryParent,
-                    name: oThis.sCategoryName
-                })
-            } else {
-                emitter.emit('database-catalog-category-add', {
-                    group_id: oThis.sCategoryGroup,
-                    parent_id: oThis.sCategoryParent,
-                    name: oThis.sCategoryName
-                })
-            }
+            this.fnSaveCategory()
+            this.fnHideCategoryEditWindow()
+        },
+        fnClose() {
+            this.fnHideCategoryEditWindow()
         }
     },
-
-    created() {
-        var oThis = this
-
-        emitter.on('database-catalog-category-group-list-loaded', ({ aList }) => {
-            oThis.aAllGroupsList = aList
-        })
-
-        emitter.on('database-catalog-category-for-group-list-loaded', ({ aList }) => {
-            oThis.aCategoriesList = [{id:null, name:'<Нет>'}].concat(aList)
-        })
-
-        emitter.on('category-window-show', (oCurrentCategory, oCategory, oGroup) => {
-            oThis.oItem = oCurrentCategory
-
-            if (!oGroup) {
-                alert('Нужно выбрать группу')
-                return
-            }
-
-            if (oThis.oItem) {
-                oThis.sCategoryName = oThis.oItem.name
-                oThis.sCategoryGroup = oThis.oItem.group_id
-                oThis.sCategoryParent = oThis.oItem.parent_id
-            } else {
-                oThis.sCategoryName = ""
-                oThis.sCategoryGroup = oGroup.id
-                oThis.sCategoryParent = oCategory ? oCategory.id : oCategory
-            }
-
-            emitter.emit('database-catalog-category-group-list')
-            emitter.emit('database-catalog-category-for-group-list', oThis.sCategoryGroup)
-
-            oThis.bShowWindow = true
-        })
-        emitter.on('category-window-close', () => {
-            oThis.bShowWindow = false
-        })
-    }
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-show="bShowRepoWindow">
     <div class="block-overlay"></div>
 
     <div id="modal-ask-api-key" class="modal show" tabindex="-1">
@@ -9,7 +9,7 @@
                     <h5 class="modal-title">Данные репозитория</h5>
                 </div>
                 <div class="modal-body" style="height: 500px; overflow-y: scroll">
-                    <template v-if="iEditIndex!=null">
+                    <template v-if="iEditIndex!==null">
                         <div class="modal-ask-api_list_buttons">
                             <div></div>
                             <div>
@@ -71,7 +71,7 @@
                                 <button class="btn btn-success" @click="fnNewRepo">Добавить</button>
                             </div>
                         </div>
-                        <div v-for="(oItem, iIndex) in aList" :key="iIndex" :class="'list-repo-item '+(iSelectedRepoIndex==iIndex ? 'active' : '')">
+                        <div v-for="(oItem, iIndex) in aReposList" :key="iIndex" :class="'list-repo-item '+(iSelectedRepoIndex==iIndex ? 'active' : '')">
                             <template v-if="oItem">
                                 <div class="list-repo-item_desc">
                                     <div class="list-repo-item_title">
@@ -109,7 +109,9 @@
 
 <script>
 
-import { emitter } from "../../EventBus"
+import { fnSaveFile, a } from "../../lib"
+
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
 
 export default {
     name: 'AskAPIWindow',
@@ -118,24 +120,27 @@ export default {
 
     },
 
+    computed: {
+        ...mapState(a`aReposList iSelectedRepoIndex bShowRepoWindow`)
+    },
+
     data() {
         return {
-            aTypes: ["github", "webdav"],
-
             iEditIndex: null,
-            iSelectedRepoIndex: null,
             sFormLogin: "",
             sFormRepo: "",
             sFormKey: "",
             sFormURL: "",
             sFromType: "github",
-            aList: []
+
             /**
              * { "login": "", "repo": "", "key": "", type: "", url: "", username: "", password: "", }
              */
         }
     },
     methods: {
+        ...mapMutations(a`fnReposRemove fnReposSelect fnReposClean fnReposUpdate`),
+        ...mapActions(a`fnPrepareRepo`),
         fnSaveRepo() {
             if (!this.sFormName) {
                 alert('Надо заполнить поле - Название')
@@ -151,8 +156,9 @@ export default {
                 "username": this.sFormUsername,
                 "password": this.sFormPassword,
             }
-            emitter.emit('database-repos-update', this.iEditIndex, oObj)
-            this.iEditIndex = null
+            this.fnReposUpdate({ iIndex:this.iEditIndex, oObj })
+            _l(this.aReposList)
+            this.iEditIndex=null
         },
         fnNewRepo() {
             this.iEditIndex = -1
@@ -166,64 +172,42 @@ export default {
             this.sFormPassword = ""
         },
         fnEditRepo(iIndex) {
-            _l("fnEditRepo", iIndex)
             this.iEditIndex = iIndex
-            this.sFormName = this.aList[this.iEditIndex].name
-            this.sFormLogin = this.aList[this.iEditIndex].login
-            this.sFormRepo = this.aList[this.iEditIndex].repo
-            this.sFormKey = this.aList[this.iEditIndex].key
-            this.sFormType = this.aList[this.iEditIndex].type
-            this.sFormURL = this.aList[this.iEditIndex].url
-            this.sFormUsername = this.aList[this.iEditIndex].username
-            this.sFormPassword = this.aList[this.iEditIndex].password
+            var oO = this.aReposList[this.iEditIndex]
+            this.sFormName = oO.name
+            this.sFormLogin = oO.login
+            this.sFormRepo = oO.repo
+            this.sFormKey = oO.key
+            this.sFormType = oO.type
+            this.sFormURL = oO.url
+            this.sFormUsername = oO.username
+            this.sFormPassword = oO.password
         },
         fnRemoveRepo(iIndex) {
-            emitter.emit('database-repos-remove', iIndex)
+            this.fnReposRemove(iIndex)
         },
         fnSelectRepo(iIndex) {
-            emitter.emit('database-repos-select', iIndex)
+            this.fnReposSelect(iIndex)
         },
         fnCleanRepo() {
-            emitter.emit('database-repos-clean')
+            this.fnReposClean()
         },
         fnCancelRepo() {
             this.iEditIndex = null
         },
         fnAcceptRepo() {
-            emitter.once('database-repos-loaded', ({aList, iSelectedRepoIndex}) => {
-                if (!aList[iSelectedRepoIndex]) {
-                    alert('Не выбрано');
-                } else {
-                    emitter.emit('database-repos-select-accept')
-                    emitter.emit('repo-window-close')
-                }
-            })
-            emitter.emit('database-repos-load')
+            if (!this.aReposList[this.iSelectedRepoIndex]) {
+                return alert('Нужно выбрать репозиторий');
+            }
+            this.fnPrepareRepo()
         },
         fnExport() {
-            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.aList, null, 4));
-            var oE = document.createElement("A");
-            oE.setAttribute("href", dataStr);
-            oE.setAttribute("download", `database_${(new Date).getTime()}.json`);
-            oE.click();
-            oE.remove()
+            fnSaveFile("database", JSON.stringify(this.aReposList))
         }
     },
     created()
     {
         var oThis = this
-
-        emitter.on('database-repos-loaded', ({aList, iSelectedRepoIndex}) => {
-            oThis.aList = aList
-            oThis.iSelectedRepoIndex = iSelectedRepoIndex
-            _l('>>>loaded', {aList, o:oThis.aList})
-        })
-
-        emitter.on('database-repos-saved', () => {
-            emitter.emit('database-repos-load')
-        })
-
-        emitter.emit('database-repos-load')
     }
 }
 </script>

@@ -2,15 +2,6 @@
     <div 
       class="wrapper"
     >
-        <div class="top-panel">
-          <div>
-            <template v-if="oRepo"> 
-            {{oRepo.name}}
-            </template>
-          </div>
-          <div class="top-right-panel">
-          </div>
-        </div>
         <div class="app-modes">
           <button class="btn" @click="fnShowRepoWindow" title="Выбрать другую сессию"><i class="bi bi-person-fill"></i></button>
           <button class="btn" @click="fnSaveAll" title="Сохранить все"><i class="bi bi-cloud-arrow-up"></i></button>
@@ -25,12 +16,14 @@
           <LinksMode v-show="sCurrentMode=='app-mode-links'"/>
         </div>
 
-        <PageEditor/>
+        <div class="editor-wrapper">
+          <PageEditor/>
+        </div>
     </div>
 
-    <ErrorWindow :message="sErrorWindowMessage" :title="sErrorWindowTitle" v-show="bShowErrorWindow"/>
+    <ErrorWindow :message="sErrorWindowMessage" :title="sErrorWindowTitle"/>
 
-    <AskAPIWindow v-show="bShowRepoWindow"/>
+    <AskAPIWindow/>
 
     <EditGroup/>
     <EditCategory/>
@@ -38,10 +31,16 @@
     <EditLink/>
     <EditTag/>
 
+    <Loader/>
     <SavedToast/>
 </template>
 
 <script>
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
+
+import { a } from "./lib"
+
+import Loader from './components/loader.vue'
 import ListMode from "./components/modes/list.vue"
 import CatalogMode from "./components/modes/catalog.vue"
 import FavoritesMode from "./components/modes/favorites.vue"
@@ -69,6 +68,7 @@ import { emitter } from "./EventBus"
 export default {
   name: 'App',
   components: {
+    Loader,
     ListMode,
     CatalogMode,
     FavoritesMode,
@@ -85,18 +85,16 @@ export default {
     EditTag,
   },
 
+  computed: {
+    ...mapState(a`bShowRepoWindow`),
+    sCurrentMode: {
+      set(sMode) { this.$store.commit('fnUpdateMode', sMode) },
+      get() { return this.$store.state.sCurrentMode }
+    }
+  },
+
   data() {
     return {
-      sURL: "",
-      oRepo: null,
-
-      bShowErrorWindow: false,
-      sErrorWindowMessage: "",
-      sErrorWindowTitle: "",
-
-      bShowRepoWindow: true,
-
-      sCurrentMode: "",
       aMenu: [
         { class:"app-mode-list", title:"Список", icon:"bi-justify" },
         { class:"app-mode-catalog", title:"Каталог", icon:"bi-grid-1x2" },
@@ -111,6 +109,9 @@ export default {
   },
 
   methods: {
+    ...mapMutations(a`fnLoadRepos fnShowRepoWindow`),
+    ...mapActions(a`fnSaveDatabase`),
+
     fnMenuItemClick(oMenuItem)
     {
       if (oMenuItem.class == "app-publish-btn") {
@@ -125,11 +126,8 @@ export default {
         this.sCurrentMode = oMenuItem.class
       }
     },
-    fnShowRepoWindow() {
-      this.bShowRepoWindow = true
-    },
     fnSaveAll() {
-      emitter.emit('database-db-save')
+      this.fnSaveDatabase()
     },
   },
 
@@ -137,7 +135,6 @@ export default {
     var oThis = this
 
     document.addEventListener('keydown', e => {
-      _l('keydown')
       if (e.ctrlKey && e.keyCode === 83) {
           e.preventDefault();
           _l('CTRL + S');
@@ -147,66 +144,7 @@ export default {
   },
 
   created() {
-    Database.fnInit()
-    var oThis = this;
-
-    emitter.emit('app-created')
-
-    emitter.on('database-load-error-github-exception', () => {
-      oThis.bShowErrorWindow = true
-    })
-
-    emitter.on('database-load-error-notfound', () => {
-      oThis.bShowErrorWindow = true
-    })
-
-    emitter.on('error-window-close', () => {
-      oThis.bShowErrorWindow = false
-    })
-
-    emitter.on('repo-window-close', () => {
-      oThis.bShowRepoWindow = false
-    })
-
-    emitter.on('database-db-load-error-notfound', () => {
-      oThis.bShowErrorWindow = true
-      oThis.sErrorWindowTitle = "Важно"
-      oThis.sErrorWindowMessage = "База заметок не была найдена. И была создана новая."
-    })
-
-    emitter.on('database-db-load-error-github-exception', (sE) => {
-      oThis.bShowErrorWindow = true
-      oThis.sErrorWindowTitle = "Ошибка"
-      oThis.sErrorWindowMessage = sE
-    })
-
-    emitter.on('database-db-save-error', (sE) => {
-      oThis.bShowErrorWindow = true
-      oThis.sErrorWindowTitle = "Ошибка"
-      oThis.sErrorWindowMessage = sE
-    })
-
-    emitter.on('database-repos-loaded', ({aList, iSelectedRepoIndex}) => {
-      _l('!!!', {aList, iSelectedRepoIndex})
-      if (aList[iSelectedRepoIndex]) {
-        var oO = oThis.oRepo = aList[iSelectedRepoIndex]
-
-        oThis.sURL = `http://github.com/${oO.login}/${oO.repo}`
-      } else {
-        oThis.oRepo = null
-      }
-    })
+    this.fnLoadRepos()
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>

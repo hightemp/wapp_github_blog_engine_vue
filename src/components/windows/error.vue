@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-show="bShowErrorWindow">
     <div class="block-overlay"></div>
 
     <div class="modal fade show" id="modal-error" tabindex="-1">

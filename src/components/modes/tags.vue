@@ -2,15 +2,12 @@
 <div id="mode-tags" class="mode">
     <div class="tags-panel">
         <div class="actions-panel">
-            <input type="text" class="form-control" @input="fnFilterTag"  v-model="sTagFilter">
+            <input type="text" class="form-control" v-model="sTagFilter">
             <Dropdown :items="aTagDropdownMenu" @clickitem="fnTagClickItem" />
         </div>
         <div class="list">
-            <template v-for="(oI, iI) in aTagsList" :key="oI.id">
-                <div :class="'input-group item-row '+(oI.id == sTagSelectedID ? 'active' : '')" @click="fnSelectTag(oI.id)">
-                    <div class="input-group-text">
-                        <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
-                    </div>
+            <template v-for="oI in aTagsList" :key="oI.id">
+                <div :class="'input-group item-row '+(oI.id == sSelectedTagID ? 'active' : '')" @click="fnSelectTag(oI.id)">
                     <a 
                         :class="'list-group-item list-group-item-action item-title '" 
                     >
@@ -22,15 +19,12 @@
     </div>
     <div class="tags-articles-panel">
         <div class="actions-panel">
-            <input type="text" class="form-control" @input="fnFilterArticle"  v-model="sArticleFilter">
+            <input type="text" class="form-control"  v-model="sArticleFilter">
             <!--Dropdown :items="aArticleDropdownMenu" /-->
         </div>
         <div class="list">
             <template v-for="oI in aArticlesList" :key="oI.id">
-                <div :class="'input-group item-row '+(oI.id == sArticleSelectedID ? 'active' : '')" @click="fnSelectArticle(oI.id)">
-                    <div class="input-group-text">
-                        <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
-                    </div>
+                <div :class="'input-group item-row '+(oI.id == sSelectedArticleID ? 'active' : '')" @click="fnSelectArticle(oI.id)">
                     <a 
                         :class="'list-group-item list-group-item-action item-title '" 
                     >
@@ -46,7 +40,9 @@
 <script>
 import Dropdown from "../dropdown.vue"
 
-import { emitter } from "../../EventBus"
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
+
+import { a } from "../../lib"
 
 export default {
     name: 'TagsMode',
@@ -55,27 +51,28 @@ export default {
         Dropdown
     },
 
+    computed: {
+        ...mapState(a`sSelectedTagID sSelectedArticleID`),
+        ...mapGetters(a`oCurrentTag`),
+        aTagsList() {
+            return this.$store.getters.fnFilterTags(this.sTagFilter)
+        },
+        aArticlesList() {
+            return this.$store.getters.fnFilterCurrentTagsArticles(this.sArticleFilter)
+        }
+    },
+
     data() {
         return {
             sTagFilter: "",
             sArticleFilter: "",
 
-            sTagSelectedID: null,
-            sArticleSelectedID: null,
-
-            oSelectedTag: null,
-
-            aTagsList: [],
-            aArticlesList: [],
-
             aTagDropdownMenu: [
-                { id:"reload", title:'<i class="bi bi-arrow-repeat"></i> Обновить' },
                 { id:"add", title:'<i class="bi bi-plus-lg"></i> Добавить' },
                 { id:"edit", title:'<i class="bi bi-pencil"></i> Редактировать' },
                 { id:"delete", title:'<i class="bi bi-trash"></i> Удалить' },
             ],
             aArticleDropdownMenu: [
-                { id:"reload", title:'<i class="bi bi-arrow-repeat"></i> Обновить' },
                 { id:"add", title:'<i class="bi bi-plus-lg"></i> Добавить' },
                 { id:"edit", title:'<i class="bi bi-pencil"></i> Редактировать' },
                 { id:"delete", title:'<i class="bi bi-trash"></i> Удалить' },
@@ -85,97 +82,28 @@ export default {
     },
 
     methods: {
-        fnFilterTag() {
-            var oThis = this
-
-            emitter.emit('database-tag-list-filter', oThis.sTagFilter)
-        },
-        fnFilterArticle() {
-            var oThis = this
-
-            emitter.emit('database-tag-article-list-filter', oThis.sArticleFilter)
-        },
-        fnSelectTag(sID)
-        {
-            emitter.emit('database-tag-select', sID)
-        },
-        fnSelectArticle(sID)
-        {
-            emitter.emit('database-article-select', sID)
-        },
+        ...mapMutations(a`fnSelectTag fnShowTagEditWindow fnRemoveTag`),
+        ...mapActions(a`fnSelectArticle`),
         fnTagClickItem(oI) {
-            var oThis = this
-
-            if (oI.id == "reload") {
-                this.fnFilterTag()
-            }
             if (oI.id == "add") {
-                emitter.emit('tag-window-show', null)
+                this.fnShowTagEditWindow(null)
             }
             if (oI.id == "edit") {
-                if (!oThis.oSelectedTag) {
+                if (!this.oCurrentTag) {
                     alert('Нужно выбрать');
                 } else {
-                    emitter.emit('tag-window-show', oThis.oSelectedTag)
+                    this.fnShowTagEditWindow(this.oCurrentTag)
                 }
             }
             if (oI.id == "delete") {
-                if (!oThis.oSelectedTag) {
+                if (!this.oCurrentTag) {
                     alert('Нужно выбрать');
                 } else {
-                    emitter.emit('database-tag-remove', oThis.oSelectedTag.id)
+                    this.fnRemoveTag(this.oCurrentTag)
                 }
             }
         },
     },
-
-    created() {
-        var oThis = this
-        _l('created')
-
-        emitter.on('database-catalog-article-selected', (sID) => {
-            oThis.sArticleSelectedID = sID
-        })
-
-        emitter.on('database-tag-selected', (sID, oI) => {
-            _l('database-tag-selected', [sID, oI])
-            oThis.sTagSelectedID = sID
-            oThis.oSelectedTag = oI
-            emitter.emit('database-tag-article-list-filter', oThis.sArticleFilter)
-        })
-
-        emitter.on('database-repos-load', () => {
-            emitter.emit('database-tag-article-list-filter', '')
-            emitter.emit('database-tag-list-filter', '')
-        })
-
-        emitter.on('database-tag-article-list-filter-loaded', ({aList, sSelectedID}) => {
-            oThis.aArticlesList = aList
-            oThis.sArticleSelectedID = sSelectedID
-        })
-
-        emitter.on('database-tag-list-filter-loaded', ({aList, sSelectedID}) => {
-            _l('database-tag-list-filter-loaded', {aList, sSelectedID})
-            oThis.aTagsList = aList
-            oThis.sTagSelectedID = sSelectedID
-        })
-
-        emitter.on('database-tag-removed', () => {
-            oThis.fnFilterTag()
-        })
-
-        emitter.on('database-tag-list-filter-reload', () => {
-            oThis.fnFilterTag()
-        })
-        
-        // emitter.on('database-article-list-loaded', ({aList, iSelectedArticle}) => {
-        //     oThis.aList = aList
-        //     oThis.sSelectedID = iSelectedArticle
-        //     _l('>>>database-article-list-loaded', {aList})
-        // })
-
-        // {"id":3, "name": "Test 3", "category_id": "1", "html": "asdfas fdasf"},
-    }
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-<div v-show="bShowWindow">
+<div v-show="bShowGroupEditWindow">
     <div class="block-overlay"></div>
     <div class="modal show" id="modal-edit-article" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -11,7 +11,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="" class="form-label">Название</label>
-                        <input type="text" class="form-control"  aria-describedby="" v-model="sGroupName">
+                        <input type="text" class="form-control"  aria-describedby="" v-model="sGroupEditWindowGroupName">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -26,67 +26,31 @@
 
 <script>
 
-import { emitter } from "../../EventBus"
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
+
+import { a, cc } from "../../lib"
 
 export default {
     name: "EditGroup",
 
     props: {},
 
-    data() {
-        return {
-            bShowWindow: false,
-
-            oItem: null,
-
-            sGroupName: "",
-        }
+    computed: {
+        ...mapState(a`bShowGroupEditWindow`),
+        ...cc(`sGroupEditWindowGroupName`),
     },
 
     methods: {
-        fnClose() {
-            var oThis = this
-            oThis.bShowWindow = false
-        },
+        ...mapMutations(a`fnHideGroupEditWindow`),
+        ...mapActions(a`fnSaveGroup`),
         fnSave() {
-            var oThis = this
-
-            emitter.once('database-catalog-group-saved', () => {
-                oThis.fnClose()
-                emitter.emit('database-catalog-group-list-filter-reload')
-            })
-
-            if (oThis.oItem) {
-                emitter.emit('database-catalog-group-update', {
-                    ...oThis.oItem,
-                    name: oThis.sGroupName
-                })
-            } else {
-                emitter.emit('database-catalog-group-add', {
-                    name: oThis.sGroupName
-                })
-            }
+            this.fnSaveGroup()
+            this.fnHideGroupEditWindow()
+        },
+        fnClose() {
+            this.fnHideGroupEditWindow()
         }
     },
-
-    created() {
-        var oThis = this
-
-        emitter.on('group-window-show', (oI) => {
-            oThis.oItem = oI
-
-            if (oThis.oItem) {
-                oThis.sGroupName = oThis.oItem.name
-            } else {
-                oThis.sGroupName = null
-            }
-
-            oThis.bShowWindow = true
-        })
-        emitter.on('group-window-close', () => {
-            oThis.bShowWindow = false
-        })
-    }
 }
 </script>
 

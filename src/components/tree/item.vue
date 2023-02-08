@@ -4,9 +4,9 @@
         @click="fnSelectItem" 
         v-if="oItem.parent_id*1 == sParent*1"
     >
-        <div class="input-group-text">
+        <!-- <div class="input-group-text">
             <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
-        </div>
+        </div> -->
         <div class="input-group-text item-flag-group"><a class="item-flag" @click="fnToggleItem"><i class="bi bi-dash-square" v-show="bIsOpened"></i><i class="bi bi-plus-square" v-show="!bIsOpened"></i></a></div>
         <a 
             :class="'list-group-item list-group-item-action item-title '" 
@@ -15,7 +15,7 @@
             <div class="item-inner-title">{{oItem.name}}</div>
         </a>
     </div>
-    <template v-for="(oI, iI) in aList" :key="oI.id">
+    <template v-for="oI in aList" :key="oI.id">
         <TreeItem
             v-if="oI.parent_id*1 == oItem.id*1 && bIsOpened"
             :item="oI"

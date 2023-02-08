@@ -1,5 +1,5 @@
 <template>
-    <template v-for="(oItem, iI) in aList" :key="oItem.id">
+    <template v-for="oItem in aList" :key="oItem.id">
         <TreeItem
             :item="oItem"
             :parent="sParent" 

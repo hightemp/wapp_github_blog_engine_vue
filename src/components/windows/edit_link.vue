@@ -1,5 +1,5 @@
 <template>
-<div v-show="bShowWindow">
+<div v-show="bShowLinkEditWindow">
     <div class="block-overlay"></div>
     <div class="modal show" id="modal-edit-article" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -11,11 +11,11 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="" class="form-label">Название</label>
-                        <input type="text" class="form-control"  aria-describedby="" v-model="sName">
+                        <input type="text" class="form-control"  aria-describedby="" v-model="sLinkEditWindowLinkName">
                     </div>
                     <div class="mb-3">
                         <label for="" class="form-label">URL</label>
-                        <input type="text" class="form-control"  aria-describedby="" v-model="sURL">
+                        <input type="text" class="form-control"  aria-describedby="" v-model="sLinkEditWindowLinkURL">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -30,71 +30,36 @@
 
 <script>
 
-import { emitter } from "../../EventBus"
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
+
+import { a, cc } from "../../lib"
 
 export default {
     name: "EditLink",
 
     props: {},
 
+    computed: {
+        ...mapState(a`bShowLinkEditWindow`),
+        ...cc(`sLinkEditWindowLinkName sLinkEditWindowLinkURL`), 
+    },
+
     data() {
         return {
-            bShowWindow: false,
-
-            oItem: null,
-
-            sName: "",
         }
     },
 
     methods: {
+        ...mapMutations(a`fnHideLinkEditWindow`),
+        ...mapActions(a`fnSaveLink`),
         fnClose() {
-            var oThis = this
-            oThis.bShowWindow = false
+            this.fnHideLinkEditWindow()
         },
         fnSave() {
-            var oThis = this
-
-            emitter.once('database-link-saved', () => {
-                oThis.fnClose()
-                emitter.emit('database-link-list-filter-reload')
-            })
-
-            if (oThis.oItem) {
-                emitter.emit('database-link-update', {
-                    ...oThis.oItem,
-                    name: oThis.sName,
-                    url: oThis.sURL,
-                })
-            } else {
-                emitter.emit('database-link-add', {
-                    name: oThis.sName,
-                    url: oThis.sURL,
-                })
-            }
+            this.fnSaveLink()
+            this.fnHideLinkEditWindow()
         }
     },
-
-    created() {
-        var oThis = this
-
-        emitter.on('link-window-show', (oI) => {
-            oThis.oItem = oI
-
-            if (oThis.oItem) {
-                oThis.sName = oThis.oItem.name
-                oThis.sURL = oThis.oItem.url
-            } else {
-                oThis.sName = ""
-                oThis.sURL = ""
-            }
-
-            oThis.bShowWindow = true
-        })
-        emitter.on('link-window-close', () => {
-            oThis.bShowWindow = false
-        })
-    }
 }
 </script>
 

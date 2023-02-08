@@ -2,15 +2,12 @@
 <div id="mode-links" class="mode">
     <div class="links-panel">
         <div class="actions-panel">
-            <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="" v-model="sFilter" @input="fnFilter">
+            <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="" v-model="sFilter">
             <Dropdown :items="aDropdownMenu" @clickitem="fnClickItem" />
         </div>
         <div class="list">
-            <template v-for="oI in aList" :key="oI.id">
-                <div :class="'input-group item-row item-links-row '+(oI.id == sSelectedID ? 'active' : '')" @click="fnSelect(oI.id)">
-                    <div class="input-group-text">
-                        <input class="form-check-input mt-0 cb-groups" type="checkbox"/>
-                    </div>
+            <template v-for="oI in aLinkList" :key="oI.id">
+                <div :class="'input-group item-row item-links-row '+(oI.id == sSelectedLinkID ? 'active' : '')" @click="fnSelectLink(oI.id)">
                     <a 
                         :class="'list-group-item list-group-item-action item-title '" 
                     >
@@ -33,7 +30,9 @@
 
 import Dropdown from "../dropdown.vue"
 
-import { emitter } from "../../EventBus"
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
+
+import { a } from "../../lib"
 
 export default {
     name: 'LinksMode',
@@ -42,86 +41,54 @@ export default {
         Dropdown
     },
 
+    computed: {
+        ...mapState(a`sSelectedLinkID`),
+        ...mapGetters(a`oCurrentLink`), 
+        aLinkList() {
+            return this.$store.getters.fnFilterLinks(this.sFilter)
+        },       
+    },
+
     data() {
         return {
-            aList: [],
             sFilter: "",
 
             sSelectedID: null,
             oSelectedLink: null,
 
             aDropdownMenu: [
-                { id:"reload", title:'<i class="bi bi-arrow-repeat"></i> Обновить' },
                 { id:"add", title:'<i class="bi bi-plus-lg"></i> Добавить' },
                 { id:"edit", title:'<i class="bi bi-pencil"></i> Редактировать' },
                 { id:"delete", title:'<i class="bi bi-trash"></i> Удалить' },
-                { id:"favorites", title:'<i class="bi bi-star-fill"></i> В избранное' },
             ]
         }
     },
 
     methods: {
-        fnFilter() {
-            var oThis = this
-
-            emitter.emit('database-link-list-filter', this.sFilter)
-        },
-        fnSelect(sID)
-        {
-            emitter.emit('database-link-select', sID)
-        },
+        ...mapMutations(a`fnSelectLink fnShowLinkEditWindow fnRemoveLink`),
         fnClickItem(oI) {
             var oThis = this
 
-            if (oI.id == "reload") {
-                this.fnFilter()
-            }
             if (oI.id == "add") {
-                emitter.emit('link-window-show', 
-                    null,
-                )
+                this.fnShowLinkEditWindow(null)
             }
             if (oI.id == "edit") {
-                if (!oThis.oSelectedLink) {
+                if (!this.oCurrentLink) {
                     alert('Нужно выбрать');
                 } else {
-                    emitter.emit('link-window-show', 
-                        oThis.oSelectedLink,
-                    )
+                    this.fnShowLinkEditWindow(this.oCurrentLink)
                 }
             }
             if (oI.id == "delete") {
-                if (!oThis.oSelectedLink) {
+                if (!this.oCurrentLink) {
                     alert('Нужно выбрать');
                 } else {
-                    emitter.emit('database-link-remove', oThis.oSelectedLink.id)
+                    this.fmRemoveLink(this.oCurrentLink)
                 }
             }
         },
     },
 
-    created() {
-        var oThis = this
-        _l('created')
-
-        emitter.on('database-link-selected', (sID, oI) => {
-            oThis.sSelectedID = sID
-            oThis.oSelectedLink = oI
-        })
-
-        emitter.on('database-repos-load', () => {
-            emitter.emit('database-link-list-filter', '')
-        })
-
-        emitter.on('database-link-list-filter-loaded', ({aList, sSelectedID}) => {
-            oThis.aList = aList
-            oThis.sSelectedID = sSelectedID
-        })
-
-        emitter.on('database-link-list-filter-reload', () => {
-            oThis.fnFilter()
-        })
-    }
 }
 </script>
 

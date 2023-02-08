@@ -2,12 +2,12 @@
 <div class="selecteion-tag-panel">
     <div class="left-tag-panel">
         <div class="actions-panel">
-            <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="" v-model="sAllTagFilter" @input="fnAllTagsFilter">
+            <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="" v-model="sAllTagFilter">
             <button class="btn" @click="fnAllTagsFilter"><i class="bi bi-arrow-repeat"></i></button>
         </div>
         <div class="selector">
             <select multiple size="10" v-model="aSelectedAllTags">
-                <option v-for="oTag in aAllTagsList" :key="oTag.id" :value="oTag.id">{{oTag.name}}</option>
+                <option v-for="oTag in aTagsList" :key="oTag.id" :value="oTag.id">{{oTag.name}}</option>
             </select>
         </div>
     </div>
@@ -33,7 +33,9 @@
 
 <script>
 
-import { emitter } from "../EventBus"
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
+
+import { a } from "../../lib"
 
 export default {
     name: "TagsSelector",
@@ -43,8 +45,13 @@ export default {
     },
 
     computed: {
+        ...mapState(a`sSelectedTagID`),
+        ...mapGetters(a`oCurrentTag`),
         sID() {
             return this.id
+        },
+        aTagsList() {
+            return this.$store.getters.fnFilterTags(this.sTagFilter)
         }
     },
 
@@ -71,53 +78,31 @@ export default {
     },
 
     methods: {
+        ...mapMutations(a`fnSelectTag fnShowTagEditWindow fnRemoveTag`),
+        ...mapActions(a`fnSelectArticle`),
         fnAllTagsFilter() {
-            _l('database-tag-list-tag-selector-filter')
-            emitter.emit('database-tag-list-tag-selector-filter', this.sAllTagFilter)
+            
         },
         fnSelectedTagsFilter() {
-            emitter.emit('database-tag-list-tag-selector-article-filter', this.sID, this.sSelectedTagFilter)
+            
         },
         fnMoveAllLeft() {
-            emitter.emit('database-tag-list-tag-selector-remove-tags', this.sID, this.aSelectedTagsList.map((oI) => oI.id))
+            
         },
         fnMoveOneLeft() {
-            emitter.emit('database-tag-list-tag-selector-remove-tags', this.sID, this.aSelectedArticleTags)
+            
         },
         fnMoveOneRight() {
-            emitter.emit('database-tag-list-tag-selector-add-tags', this.sID, this.aSelectedAllTags)
+            
         },
         fnMoveAllRight() {
-            emitter.emit('database-tag-list-tag-selector-add-tags', this.sID, this.aAllTagsList.map((oI) => oI.id))
+            
         }
     },
 
     mounted() {
         var oThis = this
-
-        oThis.fnAllTagsFilter()
-        oThis.fnSelectedTagsFilter()
     },
-
-    created() {
-        var oThis = this
-
-        emitter.on('database-tag-list-tag-selector-filter-loaded', ({ aList, sSelectedID }) => {
-            oThis.aAllTagsList = aList
-        })
-
-        emitter.on('database-tag-list-tag-selector-article-filter-loaded', ({ aList, sSelectedID }) => {
-            oThis.aSelectedTagsList = aList
-        })
-
-        emitter.on('database-tag-list-tag-selector-remove-tags-success', () => {
-            oThis.fnSelectedTagsFilter()
-        })
-
-        emitter.on('database-tag-list-tag-selector-add-tags-success', () => {
-            oThis.fnSelectedTagsFilter()
-        })
-    }
 }
 </script>
 

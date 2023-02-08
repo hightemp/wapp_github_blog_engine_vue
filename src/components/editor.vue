@@ -59,22 +59,31 @@
 <script>
 
 import { emitter } from "../EventBus"
-import TagsSelector from "./tags.vue"
+import TagsSelector from "./tags/tags.vue"
 
 import Editor from "@ckeditor/ckeditor5-build-classic"
 
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
+
+import { a, cc } from "../lib"
+
 export default {
     name: 'PageEditor',
+
+    props: [
+    ],
 
     components: {
         TagsSelector,
     },
 
+    computed: {
+        ...mapState(a`bShowEditor sArticleContent`),
+    },
+
     data() {
         return {
             sCurrentTab: "page",
-
-            bShowEditor: false,
 
             sImagesFilter: "",
             sCommentsFilter: "",
@@ -92,7 +101,16 @@ export default {
         }
     },
 
+    watch: {
+        sArticleContent (sN, sO) {
+            this.oEditor.setData(sN)
+        }
+    },
+
     methods: {
+        ...mapMutations(a`fnHideEditor`),
+        ...mapActions(a`fnSaveArticleContent`),
+
         onEditorReady(editor) {
             _l('onEditorReady')
             this.oEditor = editor
@@ -108,15 +126,12 @@ export default {
             this.fnSaveEditorContents()
         },
         fnSaveEditorContents() {
-            var oThis = this;
-            if (oThis.oEditor) {
-                emitter.emit('database-article-save-current-content', 
-                    oThis.oEditor.getData()
-                )
+            if (this.oEditor) {
+                this.fnSaveArticleContent(this.oEditor.getData())
             }
         },
         fnOpenLink() {
-            emitter.emit('database-article-open-url')
+            
         },
         fnImagesFilter() {
 
@@ -125,7 +140,7 @@ export default {
 
         },
         fnClose() {
-            emitter.emit('database-article-select', null)
+            this.fnHideEditor()
         }
     },
 
@@ -164,26 +179,6 @@ export default {
         //             console.error( error );
         //         } );
     },
-
-    created() {
-        var oThis = this;
-
-        emitter.on('database-catalog-article-selected', (sID, oArticle) => {
-            _l('database-catalog-article-selected', {sID, oArticle})
-            if (sID == null) {
-                oThis.bShowEditor = false
-                oThis.oArticle = null
-                oThis.sArticleID = sID
-            } else {
-                oThis.bShowEditor = true
-                oThis.oArticle = oArticle
-                oThis.sArticleID = sID
-                if (oThis.oEditor) {
-                    oThis.oEditor.setData(oArticle.html)
-                }
-            }
-        })
-    }
 }
 </script>
 
