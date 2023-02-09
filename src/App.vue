@@ -61,9 +61,7 @@ import SavedToast from "./components/toasts/saved.vue"
 
 import { Database } from "./Database"
 
-import { emitter } from "./EventBus"
-
-// import Editor from "./ckeditor5-36.0.0-aw402xfhqssx/src/ckeditor"
+import { fnSaveFile } from "./lib"
 
 export default {
   name: 'App',
@@ -118,7 +116,7 @@ export default {
 
       }
       else if (oMenuItem.class == "app-export-btn") {
-
+        fnSaveFile("database", JSON.stringify(this.$store.state.oDatabase))
       }
       else if (oMenuItem.class == "app-import-btn") {
 
