@@ -17,7 +17,9 @@
 
 <script>
 
-import { emitter } from "../../EventBus"
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
+
+import { a, cc } from "../../lib"
 
 export default {
     name: 'SavedToast',
@@ -26,21 +28,24 @@ export default {
 
     },
 
+    computed: {
+        ...cc(`bShowSaveToast`),
+    },
+
     data() {
         return {
-            bShowSaveToast: false
         }
     },
 
-    created() {
-        var oThis = this
-        emitter.on('database-db-saved', () => {
-            oThis.bShowSaveToast = true
-            setTimeout(() => {
-                oThis.bShowSaveToast = false
-            }, 2000)
-        })
-    }
+    watch: {
+        bShowSaveToast(bN, bO) {
+            if (bN) {
+                setTimeout(() => {
+                    this.bShowSaveToast = false
+                }, 2000)
+            }
+        }
+    },
 }
 </script>
 

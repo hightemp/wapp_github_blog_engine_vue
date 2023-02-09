@@ -64,6 +64,9 @@ export default createStore({
 
             bShowRepoWindow: true,
 
+            // NOTE: тоасты
+            bShowSaveToast: false,
+
             // NOTE: Лоадеры, Блокаторы
             bShowLoader: false,
 
@@ -331,7 +334,8 @@ export default createStore({
         },
 
         fnSaveArticleContent(state, { iIndex, sContent }) {
-            state.oDatabase.articles[iIndex].html = sContent
+            state.sArticleContent = sContent
+            // state.oDatabase.articles[iIndex].html = sContent
         },
 
         fnAddFavorite(state, oItem) {
@@ -358,6 +362,10 @@ export default createStore({
         fnSaveDatabase({ commit, state }) {
             return FileSystemDriver.fnWriteFileJSON(DATABASE_PATH, state.oDatabase)
         },
+        fnSaveArticlePage({ commit, state, getters }) {
+            var sPath = getters.fnGetCurrentArticlePath()
+            FileSystemDriver.fnWriteFile(sPath, state.sArticleContent)
+        },
         fnLoadDatabase({ commit, state }) {
             commit('fnShowLoader')
             FileSystemDriver
@@ -368,7 +376,8 @@ export default createStore({
                     commit('fnHideLoader')
                 })
                 .catch((oE) => {
-                    if ((oE+"").match(/Not found/)) {
+                    if ((oE+"").match(/Not Found/)) {
+                        _l(">>>",oE+"")
                         FileSystemDriver.fnWriteFileJSON(DATABASE_PATH, state.oDatabase)
                             .then(() => {
                                 FileSystemDriver
@@ -422,16 +431,25 @@ export default createStore({
             commit('fnRemoveLink', iIndex)
         },
 
-        fnSelectArticle({ commit, state, getters }, sID) {
+        async fnSelectArticle({ commit, state, getters }, sID) {
             commit('fnSelectArticle', sID)
             _l(">>>", sID)
             if (sID) {
-                var sS = state.sSelectedArticleID
-                var iIndex = state.oDatabase.articles.findIndex((oI) => oI.id==sS)
-                var oArticle = state.oDatabase.articles[iIndex]
-                var sHTML = oArticle.html;
-                commit('fnShowEditor')
-                commit('fnSetArticleContent', sHTML+"") 
+                var sP = getters.fnGetCurrentArticlePath()
+                FileSystemDriver.fnCreateDir("/pages/")
+                var oEx = ""
+                FileSystemDriver.fnReadFile(sP)
+                    .then(({ sData, sSHA }) => {
+                        commit('fnShowEditor')
+                        commit('fnSetArticleContent', sData) 
+                    })
+                    .catch((oE) => {
+                        if ((oE+"").match(/Not Found/)) {
+                            FileSystemDriver.fnWriteFile(sP, "")
+                            commit('fnShowEditor')
+                            commit('fnSetArticleContent', "")
+                        }
+                    })
             }
         },
 
@@ -506,6 +524,10 @@ export default createStore({
         }
     },
     getters: {
+        fnGetCurrentArticlePath: (state, getters) => () => {
+            return `/pages/${getters.oCurrentArticle.hash_name}.html`
+        },
+
         oCurrentRepo(state) {
             return state.aReposList[state.iSelectedRepoIndex]
         },

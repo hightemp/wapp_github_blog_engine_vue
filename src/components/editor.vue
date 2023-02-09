@@ -109,7 +109,7 @@ export default {
 
     methods: {
         ...mapMutations(a`fnHideEditor`),
-        ...mapActions(a`fnSaveArticleContent`),
+        ...mapActions(a`fnSaveArticleContent fnSaveArticlePage`),
 
         onEditorReady(editor) {
             _l('onEditorReady')
@@ -128,6 +128,7 @@ export default {
         fnSaveEditorContents() {
             if (this.oEditor) {
                 this.fnSaveArticleContent(this.oEditor.getData())
+                this.fnSaveArticlePage()
             }
         },
         fnOpenLink() {

@@ -2,8 +2,6 @@ import { Octokit } from "@octokit/rest"
 import { createClient } from "webdav/web"
 import { encode, decode } from 'js-base64'
 
-import { emitter } from './EventBus'
-
 export class FileSystemDriver {
     /** @var Octokit octokit */
     static octokit = null
@@ -56,6 +54,7 @@ export class FileSystemDriver {
                 .then(({ sData }) => {
                     fnResolv(JSON.parse(sData))
                 })
+                .catch((oE) => { fnReject(oE) })
         })
     }
 
@@ -69,23 +68,38 @@ export class FileSystemDriver {
         }
     }
 
-    static async fnWriteFileJSON(sFilePath, mData)
+    static fnWriteFileJSON(sFilePath, mData)
     {
-        var sData = JSON.stringify(mData)
-        await this.fnWriteFile(sFilePath, sData)
+        return this.fnWriteFile(sFilePath, JSON.stringify(mData))
     }
 
     static fnWriteFile(sFilePath, sData)
     {
         if (FileSystemDriver.oRepoItem.type == "github") {
-            return FileSystemDriver.fnWriteDatabaseGithub(sFilePath, sData)
+            return FileSystemDriver.fnWriteFileGithub(sFilePath, sData)
         }
         if (FileSystemDriver.oRepoItem.type == "webdav") {
-            return FileSystemDriver.fnWriteDatabaseWebdav(sFilePath, sData)
+            return FileSystemDriver.fnWriteFileWebdav(sFilePath, sData)
+        }
+    }
+
+    static fnCreateDir(sFilePath)
+    {
+        if (FileSystemDriver.oRepoItem.type == "webdav") {
+            return FileSystemDriver.fnCreateDirWebdav(sFilePath)
         }
     }
 
     // ===============================================================
+
+    static fnCreateDirWebdav(sFilePath)
+    {
+        return new Promise(async (fnResolv, fnReject) => {
+            _l(">>>", sFilePath)
+            FileSystemDriver.webdav.createDirectory(sFilePath)
+            fnResolv();
+        })
+    }
 
     static fnReadFileWebdav(sFilePath)
     {
@@ -125,9 +139,8 @@ export class FileSystemDriver {
         })
     }
 
-    static fnWriteDatabaseGithub(sFilePath, sData, sSHA=null)
+    static fnWriteFileGithub(sFilePath, sData, sSHA=null)
     {
-        _s('Database.fnWriteNotesDatabase')
         return new Promise(async (fnResolv, fnReject) => {
             var oR = FileSystemDriver.oRepoItem
             return FileSystemDriver.octokit.rest.repos.createOrUpdateFileContents({
@@ -148,7 +161,7 @@ export class FileSystemDriver {
         })
     }
 
-    static fnWriteDatabaseWebdav(sFilePath, sData)
+    static fnWriteFileWebdav(sFilePath, sData)
     {
         return new Promise(async (fnResolv, fnReject) => {
             var oR = FileSystemDriver.oRepoItem

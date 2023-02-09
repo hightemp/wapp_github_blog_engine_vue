@@ -38,7 +38,7 @@
 <script>
 import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
 
-import { a } from "./lib"
+import { a, cc } from "./lib"
 
 import Loader from './components/loader.vue'
 import ListMode from "./components/modes/list.vue"
@@ -84,7 +84,8 @@ export default {
   },
 
   computed: {
-    ...mapState(a`bShowRepoWindow`),
+    ...mapState(a`bShowRepoWindow sSelectedArticleID`),
+    ...cc(`bShowSaveToast`),
     sCurrentMode: {
       set(sMode) { this.$store.commit('fnUpdateMode', sMode) },
       get() { return this.$store.state.sCurrentMode }
@@ -108,7 +109,7 @@ export default {
 
   methods: {
     ...mapMutations(a`fnLoadRepos fnShowRepoWindow`),
-    ...mapActions(a`fnSaveDatabase`),
+    ...mapActions(a`fnSaveDatabase fnSaveArticlePage`),
 
     fnMenuItemClick(oMenuItem)
     {
@@ -125,7 +126,11 @@ export default {
       }
     },
     fnSaveAll() {
+      if (this.sSelectedArticleID) {
+        this.fnSaveArticlePage()
+      }
       this.fnSaveDatabase()
+      this.bShowSaveToast = true
     },
   },
 

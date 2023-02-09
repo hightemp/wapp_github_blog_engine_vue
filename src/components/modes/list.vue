@@ -60,8 +60,8 @@ export default {
     },
 
     methods: {
-        ...mapMutations(a`fnSelectArticle fnShowArticleEditWindow`),
-        ...mapActions(a`fnRemoveArticle`),
+        ...mapMutations(a`fnShowArticleEditWindow`),
+        ...mapActions(a`fnSelectArticle fnRemoveArticle`),
         fnMenuItemClick(oI)
         {
             if (oI.id == "add") {
