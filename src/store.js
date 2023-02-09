@@ -363,7 +363,8 @@ export default createStore({
             FileSystemDriver
                 .fnReadFileJSON(DATABASE_PATH)
                 .then((mData) => { 
-                    commit('fnUpdateDatabase', mData=demo_database)
+                    commit('fnUpdateDatabase', mData)
+                    // commit('fnUpdateDatabase', mData=demo_database)
                     commit('fnHideLoader')
                 })
                 .catch((oE) => {
