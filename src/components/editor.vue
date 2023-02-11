@@ -58,7 +58,6 @@
 
 <script>
 
-import { emitter } from "../EventBus"
 import TagsSelector from "./tags/tags.vue"
 
 import Editor from "@ckeditor/ckeditor5-build-classic"

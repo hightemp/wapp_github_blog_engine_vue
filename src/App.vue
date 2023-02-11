@@ -59,8 +59,6 @@ import EditTag from "./components/windows/edit_tag.vue"
 import PageEditor from "./components/editor.vue"
 import SavedToast from "./components/toasts/saved.vue"
 
-import { Database } from "./Database"
-
 import { fnSaveFile } from "./lib"
 
 export default {

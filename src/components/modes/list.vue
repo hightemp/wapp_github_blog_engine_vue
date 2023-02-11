@@ -23,8 +23,6 @@
 
 <script>
 
-import { Database } from "../../Database"
-
 import Dropdown from "../dropdown.vue"
 
 import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'

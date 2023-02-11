@@ -7,7 +7,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                 <h5 class="modal-title">{{ title }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="fnCloseErrorWindow"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="fnClose"></button>
                 </div>
                 <div class="modal-body">
                     {{ message }}
@@ -21,18 +21,17 @@
 </template>
 
 <script>
+import { a, cc } from "../../lib"
 
-import { emitter } from '../../EventBus'
+import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
 
 export default {
-    props: [
-        'message',
-        'title'
-    ],
-
+    computed: {
+        ...cc(`bShowErrorWindow`)
+    },
     methods: {
-        fnCloseErrorWindow() {
-            emitter.emit('error-window-close')
+        fnClose() {
+            this.bShowErrorWindow = false
         }
     }
 }
