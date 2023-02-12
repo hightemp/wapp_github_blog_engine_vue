@@ -180,6 +180,9 @@ export default createStore({
         fnCleanDatabase(state) {
             state.oDatabase = oDefaultDatabase
         },
+        fnLoadDemoDatabase(state) {
+            state.oDatabase = demo_database
+        },
 
         fnShowGroupEditWindow(state, oItem) {
             state.bShowGroupEditWindow = true
@@ -421,11 +424,21 @@ export default createStore({
             var iIndex = getters.fnGetLinkIndex(oItem.id)
             commit('fnUpdateLink', { iIndex, oItem })
         },
-        fnRemoveGroup({ commit, getters }, oItem) {
+        fnRemoveGroup({ state, dispatch, commit, getters }, oItem) {
+            var aC = state.oDatabase.categories.filter((oI) => ~oI.group_id==oItem.id)
+            for (oC of aC) {
+                dispatch('fnRemoveCategory', oC)
+            }
             var iIndex = getters.fnGetGroupIndex(oItem.id)
             commit('fnRemoveGroup', iIndex)
         },
-        fnRemoveCategory({ commit, getters }, oItem) {
+        fnRemoveCategory({ state, dispatch, commit, getters }, oItem) {
+            var aC = state.oDatabase.categories.filter((oI) => ~oI.parent_id==oItem.id)
+            for (oC of aC) {
+                dispatch('fnRemoveCategory', oC)
+            }
+            state.oDatabase.articles = state.oDatabase.articles.filter((oI) => !~oI.category_id==oItem.id)
+            state.oDatabase.categories = state.oDatabase.categories.filter((oI) => !~oI.parent_id==oItem.id)
             var iIndex = getters.fnGetCategoryIndex(oItem.id)
             commit('fnRemoveCategory', iIndex)
         },

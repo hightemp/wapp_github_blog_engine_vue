@@ -8,7 +8,8 @@
           <hr/>
           <a v-for="oMenuItem in aMenu" :key="oMenuItem.class" :class="(sCurrentMode==oMenuItem.class ? 'btn-primary' : '') + ' btn '+oMenuItem.class" :title="oMenuItem.title" @click="fnMenuItemClick(oMenuItem)"><i :class="'bi '+oMenuItem.icon"></i></a>
           <hr/>
-          <button class="btn" @click="fnClearDatabase" title="Удалить все"><i class="bi bi-database-x"></i></button>
+          <button class="btn" @click="fnCleanDatabaseClick" title="Удалить все"><i class="bi bi-database-x"></i></button>
+          <button class="btn" @click="fnLoadDemoDatabaseClick" title="Загрузить демо базу"><i class="bi bi-database-gear"></i></button>
         </div>
         <div class="current-mode">
           <ListMode v-show="sCurrentMode=='app-mode-list'" />
@@ -108,7 +109,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(a`fnLoadRepos fnShowRepoWindow fnCleanDatabase`),
+    ...mapMutations(a`fnLoadRepos fnShowRepoWindow fnCleanDatabase fnLoadDemoDatabase`),
     ...mapActions(a`fnSaveDatabase fnSaveArticlePage`),
 
     fnMenuItemClick(oMenuItem)
@@ -132,9 +133,16 @@ export default {
       this.fnSaveDatabase()
       this.bShowSaveToast = true
     },
-    fnClearDatabase() {
+    fnCleanDatabaseClick() {
       if (confirm("Все данные будут удалены. Продолжить?")) {
         this.fnCleanDatabase()
+        this.fnSaveDatabase()
+        this.bShowSaveToast = true
+      }
+    },
+    fnLoadDemoDatabaseClick() {
+      if (confirm("Все данные будут удалены. Продолжить?")) {
+        this.fnLoadDemoDatabase()
         this.fnSaveDatabase()
         this.bShowSaveToast = true
       }
