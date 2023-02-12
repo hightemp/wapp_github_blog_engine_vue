@@ -45,6 +45,8 @@ export default createStore({
             oRepo: null,
             iSelectedRepoIndex: null,
 
+            bSaveEditor: false,
+            
             // NOTE: Окна
             bShowErrorWindow: false,
             sErrorWindowMessage: "",
@@ -377,7 +379,14 @@ export default createStore({
         fnSaveArticlePage({ commit, state, getters }) {
             if (getters.oCurrentArticle) {
                 var sPath = getters.fnGetCurrentArticlePath()
+                // FileSystemDriver.fnReadFile(sPath)
                 FileSystemDriver.fnWriteFile(sPath, state.sArticleContent)
+                    .catch(() => {
+                        FileSystemDriver.fnReadFile(sPath)
+                        .then(() => {
+                            FileSystemDriver.fnWriteFile(sPath, state.sArticleContent)
+                        })
+                    })
             }
         },
         fnLoadDatabase({ commit, state }) {
@@ -402,6 +411,18 @@ export default createStore({
                                     })
                             })
                     }
+                })
+        },
+        fnPublishIndexFile({ commit, state }) {
+            var sContent = "# Оглавление\n\n"
+            for (var oA of state.oDatabase.articles) {
+                sContent += `- [${oA.name}](/pages/${oA.hash_name}.html)\n`
+            }
+            
+            FileSystemDriver.fnWriteFile("README.md", sContent)
+                .catch(() => {
+                    FileSystemDriver.fnReadFile("README.md")
+                        .then(()=>FileSystemDriver.fnWriteFile("README.md", sContent))
                 })
         },
         fnUpdateGroup({ commit, getters }, oItem) {

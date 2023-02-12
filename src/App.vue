@@ -86,7 +86,7 @@ export default {
 
   computed: {
     ...mapState(a`bShowRepoWindow sSelectedArticleID`),
-    ...cc(`bShowSaveToast`),
+    ...cc(`bShowSaveToast bSaveEditor`),
     sCurrentMode: {
       set(sMode) { this.$store.commit('fnUpdateMode', sMode) },
       get() { return this.$store.state.sCurrentMode }
@@ -110,7 +110,7 @@ export default {
 
   methods: {
     ...mapMutations(a`fnLoadRepos fnShowRepoWindow fnCleanDatabase fnLoadDemoDatabase`),
-    ...mapActions(a`fnSaveDatabase fnSaveArticlePage`),
+    ...mapActions(a`fnSaveDatabase fnSaveArticlePage fnPublishIndexFile`),
 
     fnMenuItemClick(oMenuItem)
     {
@@ -127,16 +127,19 @@ export default {
       }
     },
     fnSaveAll() {
+      this.bSaveEditor = true
       if (this.sSelectedArticleID) {
         this.fnSaveArticlePage()
       }
       this.fnSaveDatabase()
+      this.fnPublishIndexFile()
       this.bShowSaveToast = true
     },
     fnCleanDatabaseClick() {
       if (confirm("Все данные будут удалены. Продолжить?")) {
         this.fnCleanDatabase()
         this.fnSaveDatabase()
+        this.fnPublishIndexFile()
         this.bShowSaveToast = true
       }
     },
@@ -144,6 +147,7 @@ export default {
       if (confirm("Все данные будут удалены. Продолжить?")) {
         this.fnLoadDemoDatabase()
         this.fnSaveDatabase()
+        this.fnPublishIndexFile()
         this.bShowSaveToast = true
       }
     }

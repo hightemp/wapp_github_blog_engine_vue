@@ -18,7 +18,7 @@
                 ref="editorjs"
                 style="height: 100%"
                 @ready="onEditorReady"
-                @input="onEditorInput"
+                
             ></ckeditor>
         </div>
         <div class="tab-page-tags" v-show="sCurrentTab=='tags'">
@@ -78,6 +78,7 @@ export default {
 
     computed: {
         ...mapState(a`bShowEditor sArticleContent`),
+        ...cc(`bSaveEditor`)
     },
 
     data() {
@@ -103,6 +104,12 @@ export default {
     watch: {
         sArticleContent (sN, sO) {
             this.oEditor.setData(sN)
+        },
+        bSaveEditor(sN, oO) {
+            if (sN) {
+                this.bSaveEditor = false
+                this.fnSaveEditorContents()
+            }
         }
     },
 
@@ -126,8 +133,9 @@ export default {
         },
         fnSaveEditorContents() {
             if (this.oEditor) {
+                console.log(this.oEditor.getData())
                 this.fnSaveArticleContent(this.oEditor.getData())
-                this.fnSaveArticlePage()
+                // this.fnSaveArticlePage()
             }
         },
         fnOpenLink() {
