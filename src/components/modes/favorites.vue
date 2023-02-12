@@ -6,8 +6,8 @@
             <Dropdown :items="aDropdownMenu" @clickitem="fnArticleClickItem" />
         </div>
         <div class="list">
-            <template v-for="oI in aFavList" :key="oI.id">
-                <div :class="'input-group item-row '+(oI.id == sSelectedArticleID ? 'active' : '')" @click="fnSelectArticle(oI.id)">
+            <template v-for="(oI, iI) in aFavList" :key="iI">
+                <div v-if="oI && oI.id" :class="'input-group item-row '+(oI.id == sSelectedArticleID ? 'active' : '')" @click="fnSelectArticle(oI.id)">
                     <a 
                         :class="'list-group-item list-group-item-action item-title '" 
                     >

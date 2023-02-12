@@ -70,7 +70,7 @@ export class FileSystemDriver {
 
     static fnWriteFileJSON(sFilePath, mData)
     {
-        return this.fnWriteFile(sFilePath, JSON.stringify(mData))
+        return this.fnWriteFile(sFilePath, JSON.stringify(mData, null, 4))
     }
 
     static fnWriteFile(sFilePath, sData)

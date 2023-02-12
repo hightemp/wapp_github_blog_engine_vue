@@ -19,6 +19,23 @@ function fnFindCategoryRoot(state, sID)
     }
 }
 
+const oDefaultDatabase = {
+    "groups_last_id": 0,
+    "groups": [],
+    "categories_last_id": 0,
+    "categories": [],
+    "articles_last_id": 0,
+    "articles": [],
+    "favorites_last_id": 0,
+    "favorites": [],
+    "tags_last_id": 0,
+    "tags": [],
+    "tags_relations_last_id": 0,
+    "tags_relations": [],
+    "links_last_id": 0,
+    "links": [],
+}
+
 // Create a new store instance.
 export default createStore({
     state () {
@@ -81,22 +98,7 @@ export default createStore({
             iEditIndex: null,
 
             // NOTE: База Данных
-            oDatabase: {
-                "groups_last_id": 0,
-                "groups": [],
-                "categories_last_id": 0,
-                "categories": [],
-                "articles_last_id": 0,
-                "articles": [],
-                "favorites_last_id": 0,
-                "favorites": [],
-                "tags_last_id": 0,
-                "tags": [],
-                "tags_relations_last_id": 0,
-                "tags_relations": [],
-                "links_last_id": 0,
-                "links": [],
-            },
+            oDatabase: oDefaultDatabase,
 
             sSelectedArticleID: null,
             sSelectedCategoryID: null,
@@ -173,6 +175,10 @@ export default createStore({
         },
         fnUpdateMode(state, sMode) {
             state.sCurrentMode = sMode
+        },
+
+        fnCleanDatabase(state) {
+            state.oDatabase = oDefaultDatabase
         },
 
         fnShowGroupEditWindow(state, oItem) {
@@ -317,6 +323,9 @@ export default createStore({
         fnRemoveTag(state, iIndex) {
             state.oDatabase.tags.splice(iIndex, 1)
         },
+        fnRemoveTagRelation(state, iIndex) {
+            state.oDatabase.tags_relations.splice(iIndex, 1)
+        },
 
         fnAddLink(state, oItem) {
             state.oDatabase.links_last_id++
@@ -363,8 +372,10 @@ export default createStore({
             return FileSystemDriver.fnWriteFileJSON(DATABASE_PATH, state.oDatabase)
         },
         fnSaveArticlePage({ commit, state, getters }) {
-            var sPath = getters.fnGetCurrentArticlePath()
-            FileSystemDriver.fnWriteFile(sPath, state.sArticleContent)
+            if (getters.oCurrentArticle) {
+                var sPath = getters.fnGetCurrentArticlePath()
+                FileSystemDriver.fnWriteFile(sPath, state.sArticleContent)
+            }
         },
         fnLoadDatabase({ commit, state }) {
             commit('fnShowLoader')
@@ -419,6 +430,13 @@ export default createStore({
             commit('fnRemoveCategory', iIndex)
         },
         fnRemoveArticle({ commit, getters, state }, oItem) {
+            var iRelIndex = null;
+            while (~(iRelIndex = getters.fnGetTagRelationIndexForArticle(oItem.id))) {
+                commit('fnRemoveTagRelation', iRelIndex)
+            }
+            while (~(iRelIndex = getters.fnGetFavoriteIndexForArticle(oItem.id))) {
+                commit('fnRemoveFavorite', iRelIndex)
+            }
             var iIndex = getters.fnGetArticleIndex(oItem.id)
             commit('fnRemoveArticle', iIndex)
         },
@@ -525,7 +543,7 @@ export default createStore({
     },
     getters: {
         fnGetCurrentArticlePath: (state, getters) => () => {
-            return `/pages/${getters.oCurrentArticle.hash_name}.html`
+            return `/pages/${getters.oCurrentArticle?.hash_name}.html`
         },
 
         oCurrentRepo(state) {
@@ -542,6 +560,14 @@ export default createStore({
 
         fnGetArticle: (state) => (sID) => {
             return state.oDatabase.articles.find((oI) => oI.id == sID)
+        },
+
+        fnGetTagRelationIndexForArticle: (state) => (sID) => {
+            return state.oDatabase.tags_relations.findIndex((oI) => oI.article_id == sID)
+        },
+
+        fnGetFavoriteIndexForArticle: (state) => (sID) => {
+            return state.oDatabase.favorites.findIndex((oI) => oI.article_id == sID)
         },
 
         fnGetCategoryIndex: (state) => (sID) => {
