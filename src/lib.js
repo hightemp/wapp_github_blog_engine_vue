@@ -9,7 +9,7 @@ export function a(s) {
 export function c(sName) {
     return { [sName]:{
         get() { return this.$store.state[sName] },
-        set(sV) { this.$store.commit(`fnUpdateVar`, { sName, sV:_l(sV, '<<') } ) }
+        set(sV) { this.$store.commit(`fnUpdateVar`, { sName, sV } ) }
     } }
 } 
 
