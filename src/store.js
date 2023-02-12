@@ -46,7 +46,7 @@ export default createStore({
             iSelectedRepoIndex: null,
 
             bSaveEditor: false,
-            
+
             // NOTE: Окна
             bShowErrorWindow: false,
             sErrorWindowMessage: "",
@@ -156,6 +156,7 @@ export default createStore({
         },
         fnHideEditor(state) {
             state.bShowEditor = false
+            state.sSelectedArticleID = null
         },
         fnSelectGroup(state, sID) {
             state.sSelectedGroupID = sID
