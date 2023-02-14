@@ -6,12 +6,9 @@ import oStore from './store'
 import { createApp } from 'vue'
 import App from './App.vue'
 
-import CKEditor from '@ckeditor/ckeditor5-vue';
-
 global._l = (...a) => { console.log.apply(console, a); return a[0]; }
 global._s = () => { var o = new Error(); console.trace(o.stack.match(/at ([^\n]*)/g)[1]); }
 
 createApp(App)
     .use(oStore)
-    .use(CKEditor)
     .mount('#app')

@@ -129,8 +129,10 @@ export class FileSystemDriver {
                 repo: oR.repo,
                 path: sFilePath,
             }).then(({ data }) => {
+                console.log(data)
                 var sData = decode(data.content)
                 FileSystemDriver.oSHA[sFilePath] = data.sha
+                console.log(FileSystemDriver.oSHA)
                 fnResolv({sData, sSHA: data.sha})
             }).catch((oE) => {
                 console.error(oE)
@@ -152,7 +154,9 @@ export class FileSystemDriver {
                 message: FileSystemDriver.fnGetUpdateMessage(),
                 content: encode(sData)
             })
-            .then(() => {
+            .then((oData) => {
+                // FileSystemDriver.oSHA[sFilePath] = oData.data.content.sha
+                console.log(oData)
                 fnResolv()
             })
             .catch((oE) => {

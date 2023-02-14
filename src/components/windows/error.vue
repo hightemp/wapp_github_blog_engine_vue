@@ -26,6 +26,7 @@ import { a, cc } from "../../lib"
 import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
 
 export default {
+    props: ['title', 'message'],
     computed: {
         ...cc(`bShowErrorWindow`)
     },

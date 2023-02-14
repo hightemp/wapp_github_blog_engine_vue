@@ -211,8 +211,8 @@ export default createStore({
                 state.sCategoryEditWindowCategoryID = oItem.parent_id
             } else {
                 state.sCategoryEditWindowCategoryName = ""
-                state.sCategoryEditWindowGroupID = ""
-                state.sCategoryEditWindowCategoryID = ""
+                state.sCategoryEditWindowGroupID = state.sSelectedGroupID
+                state.sCategoryEditWindowCategoryID = state.sSelectedCategoryID
             }
         },
         fnHideCategoryEditWindow(state) {
@@ -228,8 +228,8 @@ export default createStore({
                 state.sArticleEditWindowCategoryID = oItem.category_id
             } else {
                 state.sArticleEditWindowArticleName = ""
-                state.sArticleEditWindowCategoryID = ""
-                state.sArticleEditWindowGroupID = ""
+                state.sArticleEditWindowCategoryID = state.sSelectedCategoryID
+                state.sArticleEditWindowGroupID = state.sSelectedGroupID
             }
         },
         fnHideArticleEditWindow(state) {
@@ -291,6 +291,7 @@ export default createStore({
                 id: state.oDatabase.categories_last_id
             }
             state.oDatabase.categories.push(oItem)
+            _l(state.oDatabase.categories)
         },
         fnUpdateCategory(state, { iIndex, oItem }) {
             state.oDatabase.categories.splice(iIndex, 1, oItem)
@@ -348,8 +349,9 @@ export default createStore({
             state.oDatabase.links.splice(iIndex, 1)
         },
 
-        fnSaveArticleContent(state, { iIndex, sContent }) {
-            state.sArticleContent = sContent
+        fnSaveArticleContent(state) {
+            var oA = state.oDatabase.articles.find((oI) => oI.id == state.sSelectedArticleID)
+            // oA. sArticleContent = sContent
             // state.oDatabase.articles[iIndex].html = sContent
         },
 
@@ -375,20 +377,24 @@ export default createStore({
             dispatch('fnLoadDatabase')
         },
         fnSaveDatabase({ commit, state }) {
-            return FileSystemDriver.fnWriteFileJSON(DATABASE_PATH, state.oDatabase)
+            return FileSystemDriver.fnReadFile(DATABASE_PATH)
+                .then(() => {
+                    FileSystemDriver.fnWriteFileJSON(DATABASE_PATH, state.oDatabase)
+                })
+                .catch(() => {
+                    FileSystemDriver.fnWriteFileJSON(DATABASE_PATH, state.oDatabase)
+                })
         },
-        fnSaveArticlePage({ commit, state, getters }) {
-            if (getters.oCurrentArticle) {
-                var sPath = getters.fnGetCurrentArticlePath()
-                // FileSystemDriver.fnReadFile(sPath)
-                FileSystemDriver.fnWriteFile(sPath, state.sArticleContent)
-                    .catch(() => {
-                        FileSystemDriver.fnReadFile(sPath)
-                        .then(() => {
-                            FileSystemDriver.fnWriteFile(sPath, state.sArticleContent)
-                        })
-                    })
-            }
+        fnSaveArticlePage({ commit, state, getters, dispatch }) {
+            return new Promise((fnResolv, fnReject) => {
+                if (getters.oCurrentArticle) {
+                    var sPath = getters.fnGetCurrentArticlePath()
+                    // FileSystemDriver.fnReadFile(sPath)
+                    dispatch('fnSaveFile', sPath)
+                        .then((oData) => fnResolv(oData))
+                }
+                fnResolv()
+            })
         },
         fnLoadDatabase({ commit, state }) {
             commit('fnShowLoader')
@@ -414,17 +420,21 @@ export default createStore({
                     }
                 })
         },
-        fnPublishIndexFile({ commit, state }) {
+        fnSaveFile({ commit, state }, sPath) {
+            return FileSystemDriver.fnReadFile(sPath)
+                .then(() => {
+                    FileSystemDriver.fnWriteFile(sPath, state.sArticleContent)
+                }).catch(() => {
+                    FileSystemDriver.fnWriteFile(sPath, state.sArticleContent)
+                })
+        },
+        fnPublishIndexFile({ commit, state, dispatch }) {
             var sContent = "# Оглавление\n\n"
             for (var oA of state.oDatabase.articles) {
                 sContent += `- [${oA.name}](/pages/${oA.hash_name}.html)\n`
             }
-            
-            FileSystemDriver.fnWriteFile("README.md", sContent)
-                .catch(() => {
-                    FileSystemDriver.fnReadFile("README.md")
-                        .then(()=>FileSystemDriver.fnWriteFile("README.md", sContent))
-                })
+            var sPath = "README.md"
+            return dispatch('fnSaveFile', sPath)
         },
         fnUpdateGroup({ commit, getters }, oItem) {
             var iIndex = getters.fnGetGroupIndex(oItem.id)
@@ -521,12 +531,14 @@ export default createStore({
             if (state.oCategoryEditItem===null) {
                 var oItem = { 
                     name: state.sCategoryEditWindowCategoryName,
-                    parent_id: sCategoryEditWindowCategoryID
+                    parent_id: state.sCategoryEditWindowCategoryID,
+                    group_id: state.sCategoryEditWindowGroupID
                 }
                 commit('fnAddCategory', oItem)
             } else {
                 state.oCategoryEditItem.name = state.sCategoryEditWindowCategoryName
                 state.oCategoryEditItem.parent_id = state.sCategoryEditWindowCategoryID
+                state.oCategoryEditItem.group_id = state.sCategoryEditWindowGroupID
                 dispatch('fnUpdateCategory', state.oCategoryEditItem)
             }
         },
@@ -536,8 +548,7 @@ export default createStore({
                 var oItem = { 
                     name: state.sArticleEditWindowArticleName,
                     category_id: state.sArticleEditWindowCategoryID,
-                    hash_name: fnRandomString(),
-                    html: ""
+                    hash_name: fnRandomString()
                 }
                 commit('fnAddArticle', oItem)
             } else {
@@ -572,13 +583,43 @@ export default createStore({
         },
 
         fnSaveArticleContent({ commit, getters, state }, sContent) {
-            var iIndex = state.oDatabase.articles.findIndex((oI) => oI.id == getters.oCurrentArticle.id)
-            commit('fnSaveArticleContent', { iIndex, sContent })
+            if (getters.oCurrentArticle) {
+                var iIndex = state.oDatabase.articles.findIndex((oI) => oI.id == getters.oCurrentArticle.id)
+                commit('fnSaveArticleContent', { iIndex, sContent })
+            }
+        },
+
+        async fnSave({ commit, getters, state, dispatch }) {
+            dispatch('fnSaveDatabase').then(() => {
+                dispatch('fnPublishIndexFile').then(() => {
+                    setTimeout(() => { 
+                        if (state.sSelectedArticleID) {
+                            dispatch('fnSaveArticlePage')
+                        }
+                    }, 300)
+                })
+            })
+            // setTimeout(() => { dispatch('fnSaveDatabase') }, 300)
+            // setTimeout(() => { dispatch('fnPublishIndexFile') }, 600)
+            // await dispatch('fnSaveDatabase')
+            // await dispatch('fnPublishIndexFile')
+            commit('fnUpdateVar', 'bShowSaveToast', true)
         }
     },
     getters: {
         fnGetCurrentArticlePath: (state, getters) => () => {
-            return `/pages/${getters.oCurrentArticle?.hash_name}.html`
+            return `/pages/${getters.oCurrentArticle?.hash_name}.md`
+        },
+
+        fnGetCurrentArticleLink: (state) => () => {
+            var oR = state.aReposList[state.iSelectedRepoIndex]
+            var oA = state.oDatabase.articles.find((oI) => oI.id==state.sSelectedArticleID)
+            if (oR.type == "github") {
+                return `https://github.com/${oR.login}/${oR.repo}/blob/main/pages/${oA.hash_name}.md`
+            }
+            if (oR.type == "webdav") {
+                return `${oR.url}/pages/${oA.hash_name}.md`
+            }
         },
 
         oCurrentRepo(state) {

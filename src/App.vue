@@ -110,7 +110,7 @@ export default {
 
   methods: {
     ...mapMutations(a`fnLoadRepos fnShowRepoWindow fnCleanDatabase fnLoadDemoDatabase`),
-    ...mapActions(a`fnSaveDatabase fnSaveArticlePage fnPublishIndexFile`),
+    ...mapActions(a`fnSaveDatabase fnSaveArticlePage fnPublishIndexFile fnSave`),
 
     fnMenuItemClick(oMenuItem)
     {
@@ -127,13 +127,7 @@ export default {
       }
     },
     fnSaveAll() {
-      this.bSaveEditor = true
-      if (this.sSelectedArticleID) {
-        this.fnSaveArticlePage()
-      }
-      this.fnSaveDatabase()
-      this.fnPublishIndexFile()
-      this.bShowSaveToast = true
+      this.fnSave()
     },
     fnCleanDatabaseClick() {
       if (confirm("Все данные будут удалены. Продолжить?")) {

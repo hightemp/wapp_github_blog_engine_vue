@@ -11,7 +11,7 @@
             <button class="btn btn-danger" @click="fnClose"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="tab-page" v-show="sCurrentTab=='page'">
-            <ckeditor 
+            <!-- <ckeditor 
                 :editor="oClassicEditor" 
                 v-model="sData" 
                 :config="oEditorConfig"
@@ -19,7 +19,41 @@
                 style="height: 100%"
                 @ready="onEditorReady"
                 
-            ></ckeditor>
+            ></ckeditor> -->
+            <editor
+                api-key="no-api-key"
+                :init="{
+                    height: 'calc(100vh - 30px)',
+                    menubar: false,
+                    plugins: [
+                        'advlist autolink lists link image charmap codesample print preview anchor',
+                        'searchreplace visualblocks code fullscreen',
+                        'insertdatetime media table paste code help wordcount'
+                    ],
+                    toolbar:
+                        'undo redo | formatselect | bold italic backcolor | \
+                        alignleft aligncenter alignright alignjustify | codesample code \
+                        bullist numlist outdent indent | removeformat | help',
+                    codesample_languages: [
+                        {text: 'HTML/XML', value: 'markup'},
+                        {text: 'JavaScript', value: 'javascript'},
+                        {text: 'CSS', value: 'css'},
+                        {text: 'PHP', value: 'php'},
+                        {text: 'Ruby', value: 'ruby'},
+                        {text: 'Python', value: 'python'},
+                        {text: 'Java', value: 'java'},
+                        {text: 'SQL',value:'sql'},
+                        {text: 'YAML',value:'yaml'},
+                        {text: 'C', value: 'c'},
+                        {text: 'C#', value: 'csharp'},
+                        {text: 'C++', value: 'cpp'}
+                    ],
+                }"
+                v-model="sArticleContent"
+                @init="onEditorReady"
+                @execCommand="fnExecCommand"
+                @keyDown="fnKeyDown"
+            />
         </div>
         <div class="tab-page-tags" v-show="sCurrentTab=='tags'">
             <TagsSelector :id="sArticleID"/>
@@ -60,7 +94,8 @@
 
 import TagsSelector from "./tags/tags.vue"
 
-import Editor from "@ckeditor/ckeditor5-build-classic"
+import editor from '@tinymce/tinymce-vue'
+// import Editor from "@ckeditor/ckeditor5-build-classic"
 
 import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
 
@@ -74,11 +109,13 @@ export default {
 
     components: {
         TagsSelector,
+        editor
     },
 
     computed: {
-        ...mapState(a`bShowEditor sArticleContent`),
-        ...cc(`bSaveEditor`)
+        ...mapState(a`bShowEditor`),
+        ...mapGetters(a`oCurrentRepo fnGetCurrentArticleLink fnSaveArticlePage fnSaveDatabase`),
+        ...cc(`bSaveEditor sArticleContent`)
     },
 
     data() {
@@ -93,7 +130,6 @@ export default {
             oArticle: null,
 
             oEditor: null,
-            oClassicEditor: Editor,
 
             oEditorConfig: {},
 
@@ -101,45 +137,26 @@ export default {
         }
     },
 
-    watch: {
-        sArticleContent (sN, sO) {
-            this.oEditor.setData(sN)
-        },
-        bSaveEditor(sN, oO) {
-            if (sN) {
-                this.bSaveEditor = false
-                this.fnSaveEditorContents()
-            }
-        }
-    },
-
     methods: {
         ...mapMutations(a`fnHideEditor`),
-        ...mapActions(a`fnSaveArticleContent fnSaveArticlePage`),
+        ...mapActions(a`fnSave`),
 
-        onEditorReady(editor) {
-            _l('onEditorReady')
-            this.oEditor = editor
-            editor.editing.view.change( writer => {
-                writer.setStyle( 
-                    'height', 
-                    'calc(100vh - 20px - 40px - 30px)', 
-                    editor.editing.view.document.getRoot() 
-                );
-            })
+        onEditorReady(oEvent, oEditor) {
+            this.oEditor = oEditor
         },
-        onEditorInput() {
-            this.fnSaveEditorContents()
+        fnExecCommand(oEvent, oEditor) {
+            // console.log(oEvent, oEditor)
         },
-        fnSaveEditorContents() {
-            if (this.oEditor) {
-                console.log(this.oEditor.getData())
-                this.fnSaveArticleContent(this.oEditor.getData())
-                // this.fnSaveArticlePage()
+        fnKeyDown(oEvent, oEditor) {
+            // console.log(oEvent, oEditor)
+            if (oEvent.ctrlKey && oEvent.keyCode === 83) {
+                oEvent.preventDefault();
+                _l('CTRL + S');
+                this.fnSave()
             }
         },
         fnOpenLink() {
-            
+            window.open(this.fnGetCurrentArticleLink())
         },
         fnImagesFilter() {
 
@@ -154,38 +171,6 @@ export default {
 
     mounted() {
         var oThis = this
-        // this.oEditor = new EditorJS('editorjs');
-
-        // if (!oThis.oEditor)
-        //     Editor
-        //         .create(
-        //             this.$refs.editorjs,
-        //             {
-        //                 // ...oDefaultConfig,
-        //                 codeBlock: {
-        //                     languages: [
-        //                         { language: 'plaintext', label: 'Plain text', class: '' },
-        //                         { language: 'php', label: 'PHP', class: 'php-code' },
-        //                         { language: 'python', label: 'Python' },
-        //                         { language: 'css', label: 'CSS' },
-        //                         { language: 'html', label: 'HTML' },
-        //                         { language: 'javascript', label: 'JavaScript', class: 'js javascript js-code' },
-        //                         { language: 'shell', label: 'SHELL' },
-        //                     ]
-        //                 }
-        //             }
-        //         )
-        //         .then((editor) => {
-        //             oThis.oEditor = editor
-        //             editor.setData('');
-        //             _l(editor);
-        //             editor.editing.view.change( writer => {
-        //                 writer.setStyle( 'height', 'calc(100vh - 20px - 40px - 30px)', editor.editing.view.document.getRoot() );
-        //             });
-        //         })
-        //         .catch( error => {
-        //             console.error( error );
-        //         } );
     },
 }
 </script>
