@@ -60,6 +60,9 @@ export class FileSystemDriver {
 
     static fnReadFile(sFilePath)
     {
+        if (FileSystemDriver.oRepoItem.type == "localstorage") {
+            return FileSystemDriver.fnReadFileLocalStorage(sFilePath)
+        }
         if (FileSystemDriver.oRepoItem.type == "github") {
             return FileSystemDriver.fnReadFileGithub(sFilePath)
         }
@@ -75,6 +78,9 @@ export class FileSystemDriver {
 
     static fnWriteFile(sFilePath, sData)
     {
+        if (FileSystemDriver.oRepoItem.type == "localstorage") {
+            return FileSystemDriver.fnWriteFileLocalStorage(sFilePath, sData)
+        }
         if (FileSystemDriver.oRepoItem.type == "github") {
             return FileSystemDriver.fnWriteFileGithub(sFilePath, sData)
         }
@@ -98,6 +104,14 @@ export class FileSystemDriver {
             _l(">>>", sFilePath)
             FileSystemDriver.webdav.createDirectory(sFilePath)
             fnResolv();
+        })
+    }
+
+    static fnReadFileLocalStorage(sFilePath)
+    {
+        return new Promise(async (fnResolv, fnReject) => {
+            var sData = localStorage.getItem(sFilePath);
+            fnResolv({ sData, sSHA: "" })
         })
     }
 
@@ -138,6 +152,14 @@ export class FileSystemDriver {
                 console.error(oE)
                 fnReject(oE)
             })
+        })
+    }
+
+    static fnWriteFileLocalStorage(sFilePath, sData)
+    {
+        return new Promise(async (fnResolv, fnReject) => {
+            localStorage.setItem(sFilePath, sData)
+            fnResolv()
         })
     }
 

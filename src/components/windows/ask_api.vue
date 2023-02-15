@@ -89,9 +89,15 @@
                                         <div><b>password:</b> {{oItem.password}}</div>
                                     </template>
                                 </div>
-                                <div>
+                                <div style="display:flex;align-items:start">
+                                    <template v-if="oItem.type!='localstorage'">
                                     <button class="btn btn-success" @click="fnEditRepo(iIndex)" title="Редактировать"><i class="bi bi-pencil"></i></button>
                                     <button class="btn btn-danger" @click="fnRemoveRepo(iIndex)" title="Удалить"><i class="bi bi-trash"></i></button>
+                                    </template>
+                                    <template v-else>
+                                        <div style="width: 32px; height: 29px"></div>
+                                        <div style="width: 32px; height: 29px"></div>
+                                    </template>
                                     <button class="btn btn-info" @click="fnSelectRepo(iIndex)" title="Выбрать"><i class="bi bi-star-fill"></i></button>
                                 </div>
                             </template>
@@ -121,7 +127,8 @@ export default {
     },
 
     computed: {
-        ...mapState(a`aReposList iSelectedRepoIndex bShowRepoWindow`)
+        ...mapState(a`iSelectedRepoIndex bShowRepoWindow`),
+        ...mapGetters(a`aReposList`)
     },
 
     data() {

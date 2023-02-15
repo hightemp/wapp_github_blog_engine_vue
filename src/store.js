@@ -41,6 +41,9 @@ export default createStore({
     state () {
         return {
             // NOTE: Репозитории
+            aDefaultRepoList: [
+                { type:"localstorage", name: "Локальное хранилище" }
+            ],
             aReposList: [],
             oRepo: null,
             iSelectedRepoIndex: null,
@@ -111,7 +114,7 @@ export default createStore({
     },
     mutations: {
         fnReposRemove(state, iIndex) {
-            state.aReposList.splice(iIndex, 1)
+            state.aReposList.splice(iIndex-state.aDefaultRepoList.length, 1)
             localStorage.setItem('aReposList', JSON.stringify(state.aReposList))
         },
         fnReposSelect(state, iIndex) {
@@ -125,7 +128,7 @@ export default createStore({
             if (iIndex==-1) {
                 state.aReposList.push(oObj)
             } else {
-                state.aReposList.splice(iIndex, 1, oObj)
+                state.aReposList.splice(iIndex-state.aDefaultRepoList.length, 1, oObj)
             }
             localStorage.setItem('aReposList', JSON.stringify(state.aReposList))
         },
@@ -400,14 +403,15 @@ export default createStore({
             commit('fnShowLoader')
             FileSystemDriver
                 .fnReadFileJSON(DATABASE_PATH)
-                .then((mData) => { 
+                .then((mData) => {
+                    if (!mData) throw "Cannot destructure property"
                     commit('fnUpdateDatabase', mData)
                     // commit('fnUpdateDatabase', mData=demo_database)
                     commit('fnHideLoader')
                 })
                 .catch((oE) => {
-                    if ((oE+"").match(/Not Found/)) {
-                        _l(">>>",oE+"")
+                    if ((oE+"").match(/Cannot destructure property/)
+                        || (oE+"").match(/Not Found/)) {
                         FileSystemDriver.fnWriteFileJSON(DATABASE_PATH, state.oDatabase)
                             .then(() => {
                                 FileSystemDriver
@@ -622,8 +626,11 @@ export default createStore({
             }
         },
 
-        oCurrentRepo(state) {
-            return state.aReposList[state.iSelectedRepoIndex]
+        aReposList(state) {
+            return state.aDefaultRepoList.concat(state.aReposList)
+        },
+        oCurrentRepo(state, getters) {
+            return getters.aReposList[state.iSelectedRepoIndex]
         },
 
         fnGetCategory: (state) => (sID) => {

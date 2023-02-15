@@ -11,17 +11,8 @@
             <button class="btn btn-danger" @click="fnClose"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="tab-page" v-show="sCurrentTab=='page'">
-            <!-- <ckeditor 
-                :editor="oClassicEditor" 
-                v-model="sData" 
-                :config="oEditorConfig"
-                ref="editorjs"
-                style="height: 100%"
-                @ready="onEditorReady"
-                
-            ></ckeditor> -->
             <editor
-                api-key="no-api-key"
+                api-key="tsbudecaa1nyy1uzzd269l4hjzko6g94gcjruqgfy6r1cl3a"
                 :init="{
                     height: 'calc(100vh - 30px)',
                     menubar: false,
