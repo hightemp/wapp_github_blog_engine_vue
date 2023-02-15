@@ -400,6 +400,7 @@ export default createStore({
             })
         },
         fnLoadDatabase({ commit, state }) {
+            commit('fnSelectArticle', null)
             commit('fnShowLoader')
             FileSystemDriver
                 .fnReadFileJSON(DATABASE_PATH)
