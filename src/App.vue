@@ -8,8 +8,8 @@
           <hr/>
           <a v-for="oMenuItem in aMenu" :key="oMenuItem.class" :class="(sCurrentMode==oMenuItem.class ? 'btn-primary' : '') + ' btn '+oMenuItem.class" :title="oMenuItem.title" @click="fnMenuItemClick(oMenuItem)"><i :class="'bi '+oMenuItem.icon"></i></a>
           <hr/>
-          <button class="btn" @click="fnCleanDatabaseClick" title="Удалить все"><i class="bi bi-database-x"></i></button>
-          <button class="btn" @click="fnLoadDemoDatabaseClick" title="Загрузить демо базу"><i class="bi bi-database-gear"></i></button>
+          <button class="btn" title="Экспортировать" @click="fnExport"><i class="bi bi-box-arrow-down"></i></button>
+          <button class="btn btn-import" title="Импортировать"><i class="bi bi-box-arrow-in-up"></i><label><input type="file" ref="file_selector" @change="fnFileImportChange" /></label></button>
         </div>
         <div class="current-mode">
           <ListMode v-show="sCurrentMode=='app-mode-list'" />
@@ -102,15 +102,13 @@ export default {
         { class:"app-mode-tags", title:"Тэги", icon:"bi-tags" },
         { class:"app-mode-links", title:"Ссылки", icon:"bi-link" },
         { class:"app-publish-btn", title:"Публикация", icon:"bi-journal-arrow-up" },
-        { class:"app-export-btn", title:"Экспорт", icon:"bi-download" },
-        { class:"app-import-btn", title:"Импорт", icon:"bi-upload" },
       ],
     }
   },
 
   methods: {
     ...mapMutations(a`fnLoadRepos fnShowRepoWindow fnCleanDatabase fnLoadDemoDatabase`),
-    ...mapActions(a`fnSaveDatabase fnSaveArticlePage fnPublishIndexFile fnSave`),
+    ...mapActions(a`fnSaveDatabase fnSaveArticlePage fnPublishIndexFile fnSave fnImportDatabase fnExportDatabase`),
 
     fnMenuItemClick(oMenuItem)
     {
@@ -118,7 +116,7 @@ export default {
 
       }
       else if (oMenuItem.class == "app-export-btn") {
-        fnSaveFile("database", JSON.stringify(this.$store.state.oDatabase))
+        
       }
       else if (oMenuItem.class == "app-import-btn") {
 
@@ -128,6 +126,27 @@ export default {
     },
     fnSaveAll() {
       this.fnSave()
+    },
+    fnExport() {
+      this.fnExportDatabase()
+    },
+    fnImport() {
+      let oFile = this.$refs.file_selector.files[0];
+      let reader = new FileReader();
+      var oThis = this
+
+      reader.readAsText(oFile);
+
+      reader.onload = function() {
+        oThis.fnImportDatabase(reader.result)
+      };
+
+      reader.onerror = function() {
+        console.error(reader.error);
+      };
+    },
+    fnFileImportChange() {
+      this.fnImport()
     },
     fnCleanDatabaseClick() {
       if (confirm("Все данные будут удалены. Продолжить?")) {

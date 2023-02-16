@@ -64,11 +64,12 @@
                             <div></div>
 
                             <div>
-                                <button class="btn btn-secondary" @click="fnExport">Экспортировать</button>
+                                <button class="btn btn-secondary" title="Экспортировать" @click="fnExport"><i class="bi bi-box-arrow-down"></i></button>
+                                <button class="btn btn-import btn-secondary" title="Импортировать" @click="fnImport"><i class="bi bi-box-arrow-in-up"></i><label><input type="file" ref="file_selector" @change="fnFileImportChange" /></label></button>
 
-                                <button class="btn btn-danger" @click="fnCleanRepo">Очистить</button>
+                                <button class="btn btn-danger" title="Очистить все" @click="fnCleanRepo"><i class="bi bi-trash"></i></button>
 
-                                <button class="btn btn-success" @click="fnNewRepo">Добавить</button>
+                                <button class="btn btn-success" title="Добавить" @click="fnNewRepo"><i class="bi bi-plus-lg"></i></button>
                             </div>
                         </div>
                         <div v-for="(oItem, iIndex) in aReposList" :key="iIndex" :class="'list-repo-item '+(iSelectedRepoIndex==iIndex ? 'active' : '')">
@@ -147,7 +148,7 @@ export default {
     },
     methods: {
         ...mapMutations(a`fnReposRemove fnReposSelect fnReposClean fnReposUpdate`),
-        ...mapActions(a`fnPrepareRepo`),
+        ...mapActions(a`fnPrepareRepo fnExportRepos fnImportRepos`),
         fnSaveRepo() {
             if (!this.sFormName) {
                 alert('Надо заполнить поле - Название')
@@ -209,8 +210,26 @@ export default {
             this.fnPrepareRepo()
         },
         fnExport() {
-            fnSaveFile("database", JSON.stringify(this.aReposList))
-        }
+            this.fnExportRepos()
+        },
+        fnImport() {
+            let oFile = this.$refs.file_selector.files[0];
+            let reader = new FileReader();
+            var oThis = this
+
+            reader.readAsText(oFile);
+
+            reader.onload = function() {
+                oThis.fnImportDatabase(reader.result)
+            };
+
+            reader.onerror = function() {
+                console.error(reader.error);
+            };
+        },
+        fnFileImportChange() {
+            this.fnImport()
+        },
     },
     created()
     {

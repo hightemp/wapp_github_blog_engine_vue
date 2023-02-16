@@ -3,7 +3,7 @@ import { createStore } from 'vuex'
 import demo_database from './demo_database'
 import { FileSystemDriver } from './FileSystemDriver'
 
-import { fnRandomString } from './lib'
+import { fnRandomString, fnSaveFile } from './lib'
 
 // NOTE: Константы
 export const DATABASE_PATH = "notes-database.json"
@@ -141,6 +141,9 @@ export default createStore({
         },
         fnUpdateDatabase(state, oDatabase) {
             state.oDatabase = oDatabase
+        },
+        fnUpdateRepos(state, aReposList) {
+            state.aReposList = aReposList
         },
         fnHideRepoWindow(state) {
             state.bShowRepoWindow = false
@@ -609,7 +612,21 @@ export default createStore({
             // await dispatch('fnSaveDatabase')
             // await dispatch('fnPublishIndexFile')
             commit('fnUpdateVar', 'bShowSaveToast', true)
-        }
+        },
+
+        fnExportDatabase({ commit, state, dispatch, getters }) {
+            fnSaveFile('notes-database', JSON.stringify(state.oDatabase, null, 4))
+        },
+        fnImportDatabase({ commit, state, dispatch, getters }, sData) {
+            commit('fnUpdateDatabase', JSON.parse(sData))
+        },
+
+        fnExportRepos({ commit, state, dispatch, getters }) {
+            fnSaveFile('notes-repos', JSON.stringify(state.aReposList, null, 4))
+        },
+        fnImportRepos({ commit, state, dispatch, getters }, sData) {
+            commit('fnUpdateRepos', JSON.parse(sData))
+        },
     },
     getters: {
         fnGetCurrentArticlePath: (state, getters) => () => {
