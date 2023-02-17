@@ -56,6 +56,7 @@
     "bootstrap-icons": "^1.10.3",
     "core-js": "^3.27.2",
     "js-base64": "^3.7.4",
+    "jsstore": "^4.5.1",
     "octokit": "^2.0.14",
     "tiny-emitter": "^2.1.0",
     "vue": "^3.2.13",

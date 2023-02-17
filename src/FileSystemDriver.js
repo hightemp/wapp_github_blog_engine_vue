@@ -2,6 +2,8 @@ import { Octokit } from "@octokit/rest"
 import { createClient } from "webdav/web"
 import { encode, decode } from 'js-base64'
 
+import * as JsStore from "jsstore"
+
 export class FileSystemDriver {
     /** @var Octokit octokit */
     static octokit = null
@@ -24,6 +26,35 @@ export class FileSystemDriver {
         if (oRepoItem.type == "webdav") {
             FileSystemDriver.fnInitWebdav()
         }
+        if (oRepoItem.type == "localstorage") {
+            FileSystemDriver.fnInitLocalStorage()
+        }
+    }
+
+    static async fnInitLocalStorage()
+    {
+        var oWorker = new Worker('jsstore.worker.js')
+        FileSystemDriver.oJsStore = new JsStore.Connection(oWorker);
+
+        // step1 - create database schema
+        var oFileStore = {
+            name: 'Files',
+            columns: {
+                sFilePath: { primaryKey: true, dataType: "string" },
+                sData: { notNull: false, dataType: "string" },
+            }
+        };
+
+        var db = {
+            name: 'local_storage',
+            tables: [oFileStore]
+        }
+
+        var isDbCreated = await FileSystemDriver.oJsStore.initDb(db);
+
+        // if (!isDbCreated){
+        //     alert('Connection is not opened');
+        // }
     }
 
     static fnInitGit()
@@ -110,8 +141,19 @@ export class FileSystemDriver {
     static fnReadFileLocalStorage(sFilePath)
     {
         return new Promise(async (fnResolv, fnReject) => {
-            var sData = localStorage.getItem(sFilePath);
-            fnResolv({ sData, sSHA: "" })
+            // var sData = localStorage.getItem(sFilePath);
+            var aResults = await FileSystemDriver.oJsStore.select({
+                from: 'Files',
+                where: {
+                    sFilePath
+                }
+            });
+
+            if (!aResults.length) {
+                return fnReject("Cannot destructure property")
+            }
+
+            fnResolv({ sData: aResults[0].sData, sSHA: "" })
         })
     }
 
@@ -158,7 +200,28 @@ export class FileSystemDriver {
     static fnWriteFileLocalStorage(sFilePath, sData)
     {
         return new Promise(async (fnResolv, fnReject) => {
-            localStorage.setItem(sFilePath, sData)
+            // localStorage.setItem(sFilePath, sData)
+            console.log(">>>", {sData})
+
+            FileSystemDriver.oJsStore.insert({
+                into: 'Files',
+                values: [{
+                    sFilePath,
+                    sData: (sData ? sData : ''),
+                }]
+            }).catch((_) => {
+                FileSystemDriver.oJsStore.update({ 
+                    in: 'Files',
+                    where: {
+                        sFilePath
+                    },
+                    set: {
+                        sData: (sData ? sData : ''),
+                    }
+                }).catch(async (_) => {
+                    console.error(_)
+                })    
+            })
             fnResolv()
         })
     }

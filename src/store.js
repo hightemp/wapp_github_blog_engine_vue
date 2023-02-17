@@ -692,11 +692,11 @@ export default createStore({
         },
 
         fnFilterCurrentCategories: (state) => (sFilter) => {
-            return state.oDatabase.categories.filter((oI) => ~oI.name.indexOf(sFilter) && oI.group_id == state.sSelectedGroupID)
+            return state.oDatabase.categories.filter((oI) => state.sSelectedGroupID && ~oI.name.indexOf(sFilter) && oI.group_id == state.sSelectedGroupID)
         },
 
         fnFilterCurrentArticles: (state) => (sFilter) => {
-            return state.oDatabase.articles.filter((oI) => ~oI.name.indexOf(sFilter) && oI.category_id == state.sSelectedCategoryID)
+            return state.oDatabase.articles.filter((oI) => state.sSelectedCategoryID && ~oI.name.indexOf(sFilter) && oI.category_id == state.sSelectedCategoryID)
         },
 
         fnGetFavorites: (state) => () => {
